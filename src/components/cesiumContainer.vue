@@ -37,13 +37,78 @@ onMounted(async () => {
   // 加载建筑白膜
   const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(2236714)
   viewer.scene.primitives.add(tileset)
+
+  async function loadingGLB(num, IsShow = true) {
+    const position = Cesium.Cartesian3.fromDegrees(
+      113.39592268502284,
+      31.704985763068212,
+      61.0309417
+    )
+    return viewer.entities.add({
+      name: num,
+      show: IsShow,
+      position: position,
+      orientation: Cesium.Transforms.headingPitchRollQuaternion(
+        position,
+        new Cesium.HeadingPitchRoll(
+          Cesium.Math.toRadians(0),
+          Cesium.Math.toRadians(90),
+          Cesium.Math.toRadians(-90)
+        )
+      ),
+      model: {
+        uri: `@/../python/flood/30years/glb/${num}/triangle_mesh_0.05.glb`,
+        // show: IsShow
+        // preloadWhenHidden: preload
+        // color: Cesium.Color.fromBytes(190,228,246,230),
+        // color: Cesium.Color.fromBytes(255, 255, 255, 230),
+        // colorBlendAmount:0.5,
+        colorBlendMode: Cesium.Cesium3DTileColorBlendMode.HIGHLIGHT
+        // showOutline:true,
+        // silhouetteColor: Cesium.Color.RED
+      }
+    })
+  }
+  loadingGLB(21000)
+  // // 预加载按钮模块
+  // let currentTilesetGLB
+  // let floodPrimitivesGLB = {} // 用于建立索引和 tileset 的关系
+  // async function renderTilesetWithAnimationGLB(subcontent) {
+  //   floodPrimitivesGLB = {}
+  //   // 异步加载 tileset 并建立映射关系
+  //   await Promise.all(
+  //     subcontent.map(async (item, index) => {
+  //       try {
+  //         const tileset = await loadingGLB(item)
+
+  //         // viewer.scene.primitives.add(tileset); // 添加到场景
+  //         floodPrimitivesGLB[index] = tileset // 建立索引和 tileset 的映射关系
+
+  //         inputNumberGLB.value = index + 1
+  //       } catch (error) {
+  //         console.log(error)
+  //       }
+  //     })
+  //   )
+  //   // 在所有 tileset 加载完成后执行的代码
+  //   floodPrimitivesGLB = Object.values(floodPrimitivesGLB)
+  //   console.log(floodPrimitivesGLB.forEach((item) => console.log(item.name)))
+  //   console.log('全部加载完成 : ' + floodPrimitivesGLB.length)
+  //   // floodPrimitivesGLB.forEach((primitive) =>primitive.show = false);
+  // }
+
+  // const subcontentFilePath = `@/../python/flood/30years/glb/subcontent.txt`
+  // const response = await fetch(subcontentFilePath)
+  // const data = await response.text()
+  // const subcontent = data.split('\n').map(parseFloat)
+  // renderTilesetWithAnimationGLB(subcontent)
 })
 </script>
 
 <style>
 #cesiumContainer {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   padding: 0;
   margin: 0;
   overflow: hidden;
