@@ -6,7 +6,12 @@
         <cesiumContainer> </cesiumContainer>
       </el-main>
       <el-footer height="25vh" style="--el-footer-padding: 0">
-        <echartsContainer></echartsContainer>
+        <div class="left-column">
+          <legendContainer></legendContainer>
+        </div>
+        <div class="right-column">
+          <echartsContainer></echartsContainer>
+        </div>
       </el-footer>
     </el-container>
   </div>
@@ -19,12 +24,31 @@
 <script setup>
 import cesiumContainer from '../components/cesiumContainer.vue'
 import echartsContainer from '../components/echartsContainer.vue'
+import legendContainer from '../components/legendContainer.vue'
 </script>
 
 <style>
 .common-layout {
-  height: 100vh; /* 设置容器高度为视口高度 */
-  display: flex; /* 使用弹性布局 */
-  /* flex-direction: column; 垂直排列子元素 */
+  height: 100vh;
+  display: flex;
 }
+.left-column {
+  width: 15%;
+  height: 100%;
+  float: left;
+  background-color: #ccc;
+}
+
+.right-column {
+  width: 85%;
+  height: 100%;
+  float: right;
+  background-color: #ddd;
+}
+/* 清除浮动，防止父元素塌陷 */
+/* .clearfix::after {
+  content: '';
+  clear: both;
+  display: table;
+} */
 </style>

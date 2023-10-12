@@ -102,6 +102,37 @@ onMounted(async () => {
   // const data = await response.text()
   // const subcontent = data.split('\n').map(parseFloat)
   // renderTilesetWithAnimationGLB(subcontent)
+
+  // const cesiumCanvas = await document.querySelector('#cesiumContainer canvas')
+  // console.log(cesiumCanvas)
+  // const ctx = await cesiumCanvas.getContext('2d')
+  // cesiumCanvas.addEventListener('click', function (event) {
+  //   const x = event.clientX
+  //   const y = event.clientY
+
+  //   const pixelData = ctx.getImageData(x, y, 1, 1).data
+
+  //   const red = pixelData[0]
+  //   const green = pixelData[1]
+  //   const blue = pixelData[2]
+
+  //   console.log(`点击位置的颜色为: RGB(${red}, ${green}, ${blue})`)
+  // })
+  // viewer.canvas.addEventListener('click', function (event) {
+  //   const x = event.clientX
+  //   const y = event.clientY
+
+  //   const pickedObject = viewer.scene.pick(new Cesium.Cartesian2(x, y)) // 使用pick方法获取选中的对象
+
+  //   if (Cesium.defined(pickedObject)) {
+  //     const color = pickedObject.color
+  //     const red = Cesium.Color.floatToByte(color.red)
+  //     const green = Cesium.Color.floatToByte(color.green)
+  //     const blue = Cesium.Color.floatToByte(color.blue)
+
+  //     console.log(`点击位置的颜色为: RGB(${red}, ${green}, ${blue})`)
+  //   }
+  // })
 })
 </script>
 

@@ -16,8 +16,14 @@ onMounted(async () => {
     },
     yAxis: {
       type: 'value',
-      min: 70000, // 设置最小值
-      max: 150000 // 设置最大值
+      min: 60000, // 设置最小值
+      max: 160000 // 设置最大值
+    },
+    grid: {
+      left: '55px', // 调整左边距
+      right: '20px', // 调整右边距
+      top: '20px', // 调整上边距
+      bottom: '25px' // 调整下边距
     },
     series: [
       {
@@ -43,10 +49,41 @@ onMounted(async () => {
           142941, 142863, 142725, 142540, 142270, 141905, 141777, 141644,
           141574, 141419
         ],
-        type: 'line',
+        type: 'bar',
         smooth: true
       }
     ]
+  })
+
+  // 设置响应式
+  window.addEventListener('resize', () => {
+    myChart.resize()
+  })
+
+  myChart.on('click', function (params) {
+    // 获取被点击柱状图的系列索引和数据索引
+    var seriesIndex = params.seriesIndex
+    var dataIndex = params.dataIndex
+
+    // 修改柱状图颜色
+    myChart.setOption({
+      series: [
+        {
+          itemStyle: {
+            color: function (params) {
+              if (
+                params.seriesIndex === seriesIndex &&
+                params.dataIndex === dataIndex
+              ) {
+                return '#FF6347' // 设置被点击柱状图的颜色
+              } else {
+                return params.color // 保持其他柱状图的颜色不变
+              }
+            }
+          }
+        }
+      ]
+    })
   })
 })
 </script>
