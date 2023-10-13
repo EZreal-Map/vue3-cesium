@@ -1,13 +1,15 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <!-- <el-header height="5vh">Header {{ floodStore.index }}</el-header> -->
+      <el-header height="0vh">
+        <legendContainer class="legendContainer"></legendContainer>
+        {{ floodStore.index }}
+      </el-header>
       <el-main style="--el-main-padding: 0">
         <cesiumContainer> </cesiumContainer>
       </el-main>
       <el-footer height="20vh" style="--el-footer-padding: 0">
         <div class="footer-left">
-          <!-- <legendContainer></legendContainer> -->
           <dashboardContaioner></dashboardContaioner>
         </div>
         <div class="footer-right">
@@ -25,7 +27,7 @@
 <script setup>
 import cesiumContainer from '../components/cesiumContainer.vue'
 import echartsContainer from '../components/echartsContainer.vue'
-// import legendContainer from '../components/legendContainer.vue'
+import legendContainer from '../components/legendContainer.vue'
 import dashboardContaioner from '../components/dashboardContaioner.vue'
 import { useFloodStore } from '../stores/flood'
 
@@ -66,10 +68,10 @@ const floodStore = useFloodStore()
   float: right;
   background-color: #ddd;
 }
-/* 清除浮动，防止父元素塌陷 */
-/* .clearfix::after {
-  content: '';
-  clear: both;
-  display: table;
-} */
+.legendContainer {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  z-index: 10;
+}
 </style>

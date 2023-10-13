@@ -22,15 +22,7 @@ onMounted(async () => {
     fullscreenButton: false, //隐藏全屏
     terrainProvider: await Cesium.CesiumTerrainProvider.fromIonAssetId(2248627)
   })
-  // 调整研究区域视角
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(113.39811, 31.699212, 4000.0), // 例如：1000
-    orientation: {
-      heading: Cesium.Math.toRadians(0.0), // 指定航向角度
-      pitch: Cesium.Math.toRadians(-90.0), // 指定俯仰角度
-      roll: 0.0 // 指定翻滚角度
-    }
-  })
+
   // 调整全局光源
   viewer.scene.light = new Cesium.DirectionalLight({
     color: new Cesium.Color(1.0, 1.0, 1.0, 1),
@@ -41,6 +33,16 @@ onMounted(async () => {
   const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(2236714)
   viewer.scene.primitives.add(tileset)
 
+  // 调整研究区域视角
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(113.39811, 31.699212, 4000.0), // 例如：1000
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(0.0), // 指定航向角度
+  //     pitch: Cesium.Math.toRadians(-90.0), // 指定俯仰角度
+  //     roll: 0.0 // 指定翻滚角度
+  //   }
+  // })
+  viewer.zoomTo(tileset)
   // 加载单个GLB方法
   async function loadingGLB(num, IsShow = true) {
     const position = Cesium.Cartesian3.fromDegrees(
