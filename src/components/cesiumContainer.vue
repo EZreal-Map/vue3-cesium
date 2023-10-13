@@ -133,6 +133,49 @@ onMounted(async () => {
   //     console.log(`点击位置的颜色为: RGB(${red}, ${green}, ${blue})`)
   //   }
   // })
+
+  var scene = viewer.scene
+  var context = scene.context
+
+  var readColor = false
+  var pickPosition = null // 定义 pickPosition 变量
+
+  viewer.scene.camera.percentageChanged = 0.01 // 设置缩放触发阈值
+  // 添加鼠标点击事件监听器
+  viewer.canvas.addEventListener('click', function (event) {
+    readColor = true
+    var canvas = viewer.canvas
+    var rect = canvas.getBoundingClientRect()
+    console.log(rect)
+    pickPosition = new Cesium.Cartesian2(
+      event.clientX - rect.left,
+      event.clientY - rect.top
+    )
+    console.log(pickPosition)
+    var pickRay = viewer.scene.camera.getPickRay(pickPosition)
+
+    var cartesian = viewer.scene.globe.pick(pickRay, viewer.scene)
+    if (Cesium.defined(cartesian)) {
+      var cartographic = Cesium.Cartographic.fromCartesian(cartesian)
+      var longitude = Cesium.Math.toDegrees(cartographic.longitude)
+      var latitude = Cesium.Math.toDegrees(cartographic.latitude)
+      console.log('点击位置的经纬度坐标：' + longitude + ', ' + latitude)
+    }
+  })
+
+  scene.postRender.addEventListener(function () {
+    if (readColor && pickPosition !== null) {
+      var pixels = context.readPixels({
+        x: pickPosition.x,
+        y: pickPosition.y,
+        width: 1,
+        height: 1
+      })
+      console.log('鼠标点击位置的颜色值:', pixels)
+      readColor = false
+      pickPosition = null // 重置 pickPosition
+    }
+  })
 })
 </script>
 

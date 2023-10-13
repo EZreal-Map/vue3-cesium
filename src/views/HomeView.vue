@@ -6,10 +6,11 @@
         <cesiumContainer> </cesiumContainer>
       </el-main>
       <el-footer height="25vh" style="--el-footer-padding: 0">
-        <div class="left-column">
-          <legendContainer></legendContainer>
+        <div class="footer-left">
+          <!-- <legendContainer></legendContainer> -->
+          <dashboardContaioner></dashboardContaioner>
         </div>
-        <div class="right-column">
+        <div class="footer-right">
           <echartsContainer></echartsContainer>
         </div>
       </el-footer>
@@ -24,7 +25,8 @@
 <script setup>
 import cesiumContainer from '../components/cesiumContainer.vue'
 import echartsContainer from '../components/echartsContainer.vue'
-import legendContainer from '../components/legendContainer.vue'
+// import legendContainer from '../components/legendContainer.vue'
+import dashboardContaioner from '../components/dashboardContaioner.vue'
 </script>
 
 <style>
@@ -32,15 +34,15 @@ import legendContainer from '../components/legendContainer.vue'
   height: 100vh;
   display: flex;
 }
-.left-column {
-  width: 15%;
+.footer-left {
+  width: 10%;
   height: 100%;
   float: left;
   background-color: #ccc;
 }
 
-.right-column {
-  width: 85%;
+.footer-right {
+  width: 90%;
   height: 100%;
   float: right;
   background-color: #ddd;
