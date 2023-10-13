@@ -14,15 +14,20 @@
       <div>
         <el-link :underline="false">
           <el-icon size="40px">
-            <CaretLeft @click="floodStore.index -= 1" />
+            <CaretLeft @click="floodStore.setIndex(floodStore.index - 1)" />
           </el-icon>
         </el-link>
         <el-link :underline="false">
-          <el-icon size="35px"><VideoPlay /></el-icon>
+          <el-icon v-if="!intervalID" size="35px" @click="playStartHandle">
+            <VideoPlay
+          /></el-icon>
+          <el-icon v-else size="35px" @click="stopInterval"
+            ><VideoPause
+          /></el-icon>
         </el-link>
         <el-link :underline="false">
           <el-icon size="40px">
-            <CaretRight @click="floodStore.index += 1" />
+            <CaretRight @click="floodStore.setIndex(floodStore.index + 1)" />
           </el-icon>
         </el-link>
         <!-- <el-button></el-button> -->
@@ -32,7 +37,12 @@
 </template>
 
 <script setup>
-import { CaretLeft, CaretRight, VideoPlay } from '@element-plus/icons-vue'
+import {
+  CaretLeft,
+  CaretRight,
+  VideoPlay,
+  VideoPause
+} from '@element-plus/icons-vue'
 import { onMounted, ref, watchEffect } from 'vue'
 import { useFloodStore } from '../stores/flood'
 
@@ -43,6 +53,23 @@ onMounted(() => {
     percentage.value = (floodStore.index / floodStore.maxIndex) * 100
   })
 })
+
+const intervalID = ref(null) // 创建 ref 变量
+
+const playStartHandle = () => {
+  if (intervalID.value === null) {
+    intervalID.value = setInterval(() => {
+      floodStore.setIndex(floodStore.index + 1)
+    }, 200)
+  }
+}
+
+const stopInterval = () => {
+  if (intervalID.value !== null) {
+    clearInterval(intervalID.value)
+    intervalID.value = null
+  }
+}
 </script>
 
 <style scoped>

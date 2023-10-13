@@ -4,9 +4,9 @@
 
 <script setup>
 import * as Cesium from 'cesium'
-import { onMounted } from 'vue'
-// import { useFloodStore } from '../stores/flood'
-// const floodStore = useFloodStore()
+import { onMounted, watchEffect } from 'vue'
+import { useFloodStore } from '../stores/flood'
+const floodStore = useFloodStore()
 
 onMounted(async () => {
   Cesium.Ion.defaultAccessToken =
@@ -41,6 +41,7 @@ onMounted(async () => {
   const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(2236714)
   viewer.scene.primitives.add(tileset)
 
+  // 加载单个GLB方法
   async function loadingGLB(num, IsShow = true) {
     const position = Cesium.Cartesian3.fromDegrees(
       113.39592268502284,
@@ -72,113 +73,85 @@ onMounted(async () => {
       }
     })
   }
-  loadingGLB(21000)
   // 预加载按钮模块
-  // let currentTilesetGLB
-  // let floodPrimitivesGLB = {} // 用于建立索引和 tileset 的关系
-  // async function renderTilesetWithAnimationGLB(subcontent) {
-  //   floodPrimitivesGLB = {}
-  //   // 异步加载 tileset 并建立映射关系
-  //   await Promise.all(
-  //     subcontent.map(async (item, index) => {
-  //       try {
-  //         const tileset = await loadingGLB(item)
+  // 用于建立索引和 tileset 的关系 ***重要变量***
+  let floodPrimitivesGLB = {}
+  async function renderTilesetWithAnimationGLB(subcontents) {
+    floodPrimitivesGLB = {}
+    // 异步加载 tileset 并建立映射关系
+    await Promise.all(
+      subcontents.map(async (item, index) => {
+        try {
+          const tileset = await loadingGLB(item)
+          // viewer.scene.primitives.add(tileset); // 添加到场景
+          floodPrimitivesGLB[index] = tileset // 建立索引和 tileset 的映射关系
+        } catch (error) {
+          console.log(error)
+        }
+      })
+    )
+    // 在所有 tileset 加载完成后执行的代码
+    floodPrimitivesGLB = Object.values(floodPrimitivesGLB)
+    console.log(floodPrimitivesGLB.forEach((item) => console.log(item.name)))
+    console.log('全部加载完成 : ' + floodPrimitivesGLB.length)
+    // floodPrimitivesGLB.forEach((primitive) =>primitive.show = false);
+  }
+  renderTilesetWithAnimationGLB(floodStore.subcontents)
 
-  //         // viewer.scene.primitives.add(tileset); // 添加到场景
-  //         floodPrimitivesGLB[index] = tileset // 建立索引和 tileset 的映射关系
+  // 加载播放动画模块
+  function showFloodPrimitivesGLB(index) {
+    // 隐藏
+    floodPrimitivesGLB.forEach((primitive) => (primitive.show = false))
+    // 显示
+    floodPrimitivesGLB[index - 1].show = true
+  }
+  watchEffect(() => {
+    showFloodPrimitivesGLB(floodStore.index)
+  })
 
-  //         inputNumberGLB.value = index + 1
-  //       } catch (error) {
-  //         console.log(error)
-  //       }
-  //     })
-  //   )
-  //   // 在所有 tileset 加载完成后执行的代码
-  //   floodPrimitivesGLB = Object.values(floodPrimitivesGLB)
-  //   console.log(floodPrimitivesGLB.forEach((item) => console.log(item.name)))
-  //   console.log('全部加载完成 : ' + floodPrimitivesGLB.length)
-  //   // floodPrimitivesGLB.forEach((primitive) =>primitive.show = false);
-  // }
+  // 新添加颜色pick模块（待更新完善）
+  // const scene = viewer.scene
+  // const context = scene.context
 
-  // const subcontentFilePath = `@/../python/flood/30years/glb/subcontent.txt`
-  // const response = await fetch(subcontentFilePath)
-  // const data = await response.text()
-  // const subcontent = data.split('\n').map(parseFloat)
-  // renderTilesetWithAnimationGLB(subcontent)
+  // let readColor = false
+  // let pickPosition = null // 定义 pickPosition 变量
 
-  // const cesiumCanvas = await document.querySelector('#cesiumContainer canvas')
-  // console.log(cesiumCanvas)
-  // const ctx = await cesiumCanvas.getContext('2d')
-  // cesiumCanvas.addEventListener('click', function (event) {
-  //   const x = event.clientX
-  //   const y = event.clientY
-
-  //   const pixelData = ctx.getImageData(x, y, 1, 1).data
-
-  //   const red = pixelData[0]
-  //   const green = pixelData[1]
-  //   const blue = pixelData[2]
-
-  //   console.log(`点击位置的颜色为: RGB(${red}, ${green}, ${blue})`)
-  // })
+  // viewer.scene.camera.percentageChanged = 0.01 // 设置缩放触发阈值
+  // // 添加鼠标点击事件监听器
   // viewer.canvas.addEventListener('click', function (event) {
-  //   const x = event.clientX
-  //   const y = event.clientY
+  //   readColor = true
+  //   const canvas = viewer.canvas
+  //   const rect = canvas.getBoundingClientRect()
+  //   console.log(rect)
+  //   pickPosition = new Cesium.Cartesian2(
+  //     event.clientX - rect.left,
+  //     event.clientY - rect.top
+  //   )
+  //   console.log(pickPosition)
+  //   const pickRay = viewer.scene.camera.getPickRay(pickPosition)
 
-  //   const pickedObject = viewer.scene.pick(new Cesium.Cartesian2(x, y)) // 使用pick方法获取选中的对象
-
-  //   if (Cesium.defined(pickedObject)) {
-  //     const color = pickedObject.color
-  //     const red = Cesium.Color.floatToByte(color.red)
-  //     const green = Cesium.Color.floatToByte(color.green)
-  //     const blue = Cesium.Color.floatToByte(color.blue)
-
-  //     console.log(`点击位置的颜色为: RGB(${red}, ${green}, ${blue})`)
+  //   const cartesian = viewer.scene.globe.pick(pickRay, viewer.scene)
+  //   if (Cesium.defined(cartesian)) {
+  //     const cartographic = Cesium.Cartographic.fromCartesian(cartesian)
+  //     const longitude = Cesium.Math.toDegrees(cartographic.longitude)
+  //     const latitude = Cesium.Math.toDegrees(cartographic.latitude)
+  //     console.log('点击位置的经纬度坐标：' + longitude + ', ' + latitude)
   //   }
   // })
 
-  var scene = viewer.scene
-  var context = scene.context
-
-  var readColor = false
-  var pickPosition = null // 定义 pickPosition 变量
-
-  viewer.scene.camera.percentageChanged = 0.01 // 设置缩放触发阈值
-  // 添加鼠标点击事件监听器
-  viewer.canvas.addEventListener('click', function (event) {
-    readColor = true
-    var canvas = viewer.canvas
-    var rect = canvas.getBoundingClientRect()
-    console.log(rect)
-    pickPosition = new Cesium.Cartesian2(
-      event.clientX - rect.left,
-      event.clientY - rect.top
-    )
-    console.log(pickPosition)
-    var pickRay = viewer.scene.camera.getPickRay(pickPosition)
-
-    var cartesian = viewer.scene.globe.pick(pickRay, viewer.scene)
-    if (Cesium.defined(cartesian)) {
-      var cartographic = Cesium.Cartographic.fromCartesian(cartesian)
-      var longitude = Cesium.Math.toDegrees(cartographic.longitude)
-      var latitude = Cesium.Math.toDegrees(cartographic.latitude)
-      console.log('点击位置的经纬度坐标：' + longitude + ', ' + latitude)
-    }
-  })
-
-  scene.postRender.addEventListener(function () {
-    if (readColor && pickPosition !== null) {
-      var pixels = context.readPixels({
-        x: pickPosition.x,
-        y: pickPosition.y,
-        width: 1,
-        height: 1
-      })
-      console.log('鼠标点击位置的颜色值:', pixels)
-      readColor = false
-      pickPosition = null // 重置 pickPosition
-    }
-  })
+  // scene.postRender.addEventListener(function () {
+  //   if (readColor && pickPosition !== null) {
+  //     const pixels = context.readPixels({
+  //       x: pickPosition.x,
+  //       y: pickPosition.y,
+  //       width: 1,
+  //       height: 1
+  //     })
+  //     console.log('鼠标点击位置的颜色值:', pixels)
+  //     readColor = false
+  //     pickPosition = null // 重置 pickPosition
+  //   }
+  // })
 })
 </script>
 
