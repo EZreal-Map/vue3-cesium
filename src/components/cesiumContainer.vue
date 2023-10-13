@@ -92,8 +92,9 @@ onMounted(async () => {
     )
     // 在所有 tileset 加载完成后执行的代码
     floodPrimitivesGLB = Object.values(floodPrimitivesGLB)
-    console.log(floodPrimitivesGLB.forEach((item) => console.log(item.name)))
-    console.log('全部加载完成 : ' + floodPrimitivesGLB.length)
+    floodStore.initReady = true
+    // console.log(floodPrimitivesGLB.forEach((item) => console.log(item.name)))
+    // console.log('全部加载完成 : ' + floodPrimitivesGLB.length)
     // floodPrimitivesGLB.forEach((primitive) =>primitive.show = false);
   }
   renderTilesetWithAnimationGLB(floodStore.subcontents)
@@ -101,12 +102,16 @@ onMounted(async () => {
   // 加载播放动画模块
   function showFloodPrimitivesGLB(index) {
     // 隐藏
-    floodPrimitivesGLB.forEach((primitive) => (primitive.show = false))
-    // 显示
-    floodPrimitivesGLB[index - 1].show = true
+    if (Array.isArray(floodPrimitivesGLB)) {
+      floodPrimitivesGLB.forEach((primitive) => (primitive.show = false))
+      // 显示
+      floodPrimitivesGLB[index - 1].show = true
+    }
   }
   watchEffect(() => {
-    showFloodPrimitivesGLB(floodStore.index)
+    if (floodPrimitivesGLB) {
+      showFloodPrimitivesGLB(floodStore.index)
+    }
   })
 
   // 新添加颜色pick模块（待更新完善）

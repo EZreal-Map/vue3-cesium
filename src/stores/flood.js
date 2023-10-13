@@ -1,10 +1,13 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useFloodStore = defineStore('flood', () => {
-  let subcontents = ref([])
   const index = ref(0)
   const maxIndex = computed(() => subcontents.value.length)
+  let initReady = ref(false)
+  let subcontents = ref([])
+  let echartSeries = ref([])
+
   function setIndex(newIndex) {
     if (newIndex > maxIndex.value) {
       index.value = 1
@@ -19,9 +22,21 @@ export const useFloodStore = defineStore('flood', () => {
     const data = await response.text()
     subcontents.value = data.split('\n').map(parseFloat)
   }
-  // watch(index, (newValue, oldValue) => {
-  //   console.log(`count发生了变化，老值为${oldValue},新值为${newValue}`)
-  // })
 
-  return { subcontents, index, maxIndex, setIndex, initSubcontents }
+  async function initEchartSeries(echartSeriesFilePath) {
+    const response = await fetch(echartSeriesFilePath)
+    const data = await response.text()
+    echartSeries.value = data.split('\n').map(parseFloat)
+  }
+
+  return {
+    index,
+    maxIndex,
+    initReady,
+    subcontents,
+    echartSeries,
+    setIndex,
+    initSubcontents,
+    initEchartSeries
+  }
 })

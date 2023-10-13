@@ -2,7 +2,7 @@
   <div class="container">
     <div>
       <div>
-        <el-progress type="dashboard" :percentage="percentage">
+        <el-progress type="dashboard" :percentage="percentage || 0">
           <span class="percentage-value">
             <span>{{ floodStore.index }} / </span>
             <span>{{ floodStore.maxIndex }}</span>

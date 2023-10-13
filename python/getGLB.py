@@ -13,9 +13,9 @@ def write_subdirectories_to_file(sorted_subdirectories, file_path):
     with open(file_path, 'w') as f:
         # 将每个子目录名称写入文件，每个名称占一行
         for directory in sorted_subdirectories[:-1]:
-            f.write(directory + "\n")
+            f.write(str(directory) + "\n")
         # 最后一行领出来for循环写，避免文件末尾多出一行空行
-        f.write(sorted_subdirectories[-1])
+        f.write(str(sorted_subdirectories[-1]))
 
 def read_data_between_brackets(file_path):
     data = []
@@ -62,7 +62,7 @@ def get_interval_index(H, intervals):
 # 主函数main()
 # 记录开始时间
 start_time = time.time()
-directory_path = './flood/30years'
+directory_path = './flood/50years'
 subdirectories = get_numeric_subdirectories(directory_path)
 # 按照数字大小排序
 sorted_subdirectories = sorted(subdirectories, key=lambda x: int(x))
@@ -105,10 +105,12 @@ with open( os.path.join(
 utm113 = Proj("+proj=tmerc +lon_0=113.35 +y_0=0 +x_0=500000 +ellps=IAU76 \
 +towgs84=-7.849095,18.661172,12.682502,0.809388,-1.667217,-56.719783,-3.30421e-007 +units=m +no_defs")
 
-count = 1
-threshold = 0.05
+threshold = 0.05 # 选择H高度 阈值
+count = 1 # 打印进度
+lengthStatistics =[] # 保存阈值筛选后的三角网格数量
+
 for directory in sorted_subdirectories:
-    print(f'当前正在写入第{count}/{len(sorted_subdirectories)}个文件夹----{directory}')
+    print(f'当前正在写入第 {count}/{len(sorted_subdirectories)} 个文件夹----{directory}')
 
     # Hrgb_inputfile_path = os.path.join(
     #     directory_path, directory, 'Hrgb.txt')
@@ -172,8 +174,8 @@ for directory in sorted_subdirectories:
     #     line = file.readline().strip()  # 读取并去除首尾空白字符
     #     longitude, latitude, height = map(float, line.split())
     utm_x, utm_y = utm113(longitude, latitude, inverse=False)
-    print(f"中心点修正 ---> longitude: {longitude}, latitude: {latitude}, Height: {height}")
-    print(f"中心点修正 ---> utm_x: {utm_x}, utm_y: {utm_y}, Height: {height}")
+    # print(f"中心点修正 ---> longitude: {longitude}, latitude: {latitude}, Height: {height}")
+    # print(f"中心点修正 ---> utm_x: {utm_x}, utm_y: {utm_y}, Height: {height}")
     
     # rectify_vertices = np.array(vertices)
     rectify_vertices = rectify_vertices - np.array([utm_x,utm_y,height])
@@ -199,18 +201,19 @@ for directory in sorted_subdirectories:
             clearFacesColor.append([(val / 255) ** 2.2 * 255 for val in rgbList])
             # clearFacesColor.append([149, 208, 238])
 
+    lengthStatistics.append(len(clearFaces))
 
     mesh = trimesh.Trimesh(vertices=rectify_vertices, faces=clearFaces)
     mesh.visual.face_colors = clearFacesColor    
     
     # 创建一个字典来存储自定义属性（可能有问题，目前还没起作用 -> 0927）
-    custom_attributes = {}  
-    # 为每个面分配自定义数据（例如，面的编号）
-    for i, face in enumerate(mesh.faces):
-        custom_attributes[i] = {"KHR_materials_unlit": {}}
+    # custom_attributes = {}  
+    # # 为每个面分配自定义数据（例如，面的编号）
+    # for i, face in enumerate(mesh.faces):
+    #     custom_attributes[i] = {"KHR_materials_unlit": {}}
 
-    # 将自定义属性分配给网格
-    mesh.metadata['face_attributes'] = custom_attributes
+    # # 将自定义属性分配给网格
+    # mesh.metadata['face_attributes'] = custom_attributes
 
     # 保存为glb格式
     mesh.export(glb_outputfile_path, file_type='glb')
@@ -224,9 +227,15 @@ subcontent_file_path = os.path.join(
     directory_path, 'glb/subcontents.txt')
 # 调用函数，将子目录名称写入 subcontent.txt 文件
 write_subdirectories_to_file(sorted_subdirectories, subcontent_file_path)
+
+# 借用写子目录函数，保存lengthStatistics
+lengthStatistics_file_path = os.path.join(
+    directory_path, 'glb/echartSeries.txt')
+# 调用函数，将子目录名称写入 subcontent.txt 文件
+write_subdirectories_to_file(lengthStatistics, lengthStatistics_file_path)
+
 # 记录结束时间
 end_time = time.time()
 # 计算运行时间
 execution_time = end_time - start_time
-print("代码运行时间为：", execution_time, "秒")
-# 代码运行时间为： 500.0 秒
+print("代码运行时间为：", execution_time, "秒")   # 代码运行时间为： 283.9342534542084 秒

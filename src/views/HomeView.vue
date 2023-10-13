@@ -1,11 +1,11 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-header height="5vh">Header {{ floodStore.index }}</el-header>
+      <!-- <el-header height="5vh">Header {{ floodStore.index }}</el-header> -->
       <el-main style="--el-main-padding: 0">
         <cesiumContainer> </cesiumContainer>
       </el-main>
-      <el-footer height="25vh" style="--el-footer-padding: 0">
+      <el-footer height="20vh" style="--el-footer-padding: 0">
         <div class="footer-left">
           <!-- <legendContainer></legendContainer> -->
           <dashboardContaioner></dashboardContaioner>
@@ -36,7 +36,13 @@ const floodStore = useFloodStore()
   await floodStore.initSubcontents(
     '@/../python/flood/30years/glb/subcontents.txt'
   )
-  console.log(floodStore.subcontents)
+  // console.log(floodStore.subcontents)
+  await floodStore.initEchartSeries(
+    '@/../python/flood/30years/glb/echartSeries.txt'
+  )
+  // console.log(floodStore.echartSeries)
+  floodStore.initReady = true
+  console.log(floodStore.initReady)
 })()
 
 // console.log(floodStore.subcontents[150])
