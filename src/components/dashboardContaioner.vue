@@ -2,24 +2,30 @@
   <div class="container">
     <div>
       <div>
-        <el-progress
-          ref="dashBoardDom"
-          type="dashboard"
-          :percentage="50"
-          :color="colors"
-        />
+        <el-progress type="dashboard" :percentage="percentage">
+          <span class="percentage-value">
+            <span>{{ floodStore.index }} / </span>
+            <span>{{ floodStore.maxIndex }}</span>
+          </span>
+        </el-progress>
+        <!-- :color="colors" 这里还可以定义颜色环属性，待考虑 -->
       </div>
 
       <div>
         <el-link :underline="false">
-          <el-icon size="40px"><CaretLeft /></el-icon>
+          <el-icon size="40px">
+            <CaretLeft @click="floodStore.index -= 1" />
+          </el-icon>
         </el-link>
         <el-link :underline="false">
           <el-icon size="35px"><VideoPlay /></el-icon>
         </el-link>
         <el-link :underline="false">
-          <el-icon size="40px"><CaretRight /></el-icon>
+          <el-icon size="40px">
+            <CaretRight @click="floodStore.index += 1" />
+          </el-icon>
         </el-link>
+        <!-- <el-button></el-button> -->
       </div>
     </div>
   </div>
@@ -27,12 +33,15 @@
 
 <script setup>
 import { CaretLeft, CaretRight, VideoPlay } from '@element-plus/icons-vue'
-import { onMounted, ref } from 'vue'
-const dashBoardDom = ref(null)
+import { onMounted, ref, watchEffect } from 'vue'
+import { useFloodStore } from '../stores/flood'
 
+const percentage = ref(0)
+const floodStore = useFloodStore()
 onMounted(() => {
-  const span = dashBoardDom.value.$el.querySelector('span')
-  span.innerHTML = '123/175'
+  watchEffect(() => {
+    percentage.value = (floodStore.index / floodStore.maxIndex) * 100
+  })
 })
 </script>
 

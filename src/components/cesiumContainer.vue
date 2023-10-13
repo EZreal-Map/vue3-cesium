@@ -5,6 +5,9 @@
 <script setup>
 import * as Cesium from 'cesium'
 import { onMounted } from 'vue'
+// import { useFloodStore } from '../stores/flood'
+// const floodStore = useFloodStore()
+
 onMounted(async () => {
   Cesium.Ion.defaultAccessToken =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlODBjMmY1YS00NjZjLTQwZjUtYTVhNy05NDBiODliYWYwMzUiLCJpZCI6MTU1ODM0LCJpYXQiOjE2OTAwOTA4MTN9.s-rWLcdw5_e2j9Fz2l41ydsl23lAVJg2Q3XhThRUeRM'
@@ -70,7 +73,7 @@ onMounted(async () => {
     })
   }
   loadingGLB(21000)
-  // // 预加载按钮模块
+  // 预加载按钮模块
   // let currentTilesetGLB
   // let floodPrimitivesGLB = {} // 用于建立索引和 tileset 的关系
   // async function renderTilesetWithAnimationGLB(subcontent) {

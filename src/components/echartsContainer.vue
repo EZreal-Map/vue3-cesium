@@ -4,10 +4,12 @@
 
 <script setup>
 import * as echarts from 'echarts'
-import { onMounted } from 'vue'
+import { onMounted, watchEffect } from 'vue'
+import { useFloodStore } from '../stores/flood'
+const floodStore = useFloodStore()
 onMounted(async () => {
   // 基于准备好的dom，初始化echarts实例
-  var myChart = echarts.init(document.getElementById('echartsContainer'))
+  const myChart = echarts.init(document.getElementById('echartsContainer'))
   // 绘制图表
   myChart.setOption({
     xAxis: {
@@ -64,7 +66,7 @@ onMounted(async () => {
     // 获取被点击柱状图的系列索引和数据索引
     var seriesIndex = params.seriesIndex
     var dataIndex = params.dataIndex
-
+    floodStore.setIndex(dataIndex + 1)
     // 修改柱状图颜色
     myChart.setOption({
       series: [
@@ -75,6 +77,31 @@ onMounted(async () => {
                 params.seriesIndex === seriesIndex &&
                 params.dataIndex === dataIndex
               ) {
+                return '#FF6347' // 设置被点击柱状图的颜色
+              } else {
+                return params.color // 保持其他柱状图的颜色不变
+              }
+            }
+          }
+        }
+      ]
+    })
+  })
+
+  watchEffect(() => {
+    // 修改柱状图颜色
+    // const dataIndex = 0
+    const seriesIndex = floodStore.index - 1
+    // const option = myChart.getOption() // 获取当前图表配置
+    // const series = option.series[0]
+    // console.log(series)
+    // 修改柱状图颜色
+    myChart.setOption({
+      series: [
+        {
+          itemStyle: {
+            color: function (params) {
+              if (params.dataIndex === seriesIndex) {
                 return '#FF6347' // 设置被点击柱状图的颜色
               } else {
                 return params.color // 保持其他柱状图的颜色不变

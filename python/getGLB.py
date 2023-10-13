@@ -221,7 +221,7 @@ for directory in sorted_subdirectories:
 
 # 保存子目录为directory_path = '/flood/30years/glb' 里面的subcontent.txt文件
 subcontent_file_path = os.path.join(
-    directory_path, 'glb/subcontent.txt')
+    directory_path, 'glb/subcontents.txt')
 # 调用函数，将子目录名称写入 subcontent.txt 文件
 write_subdirectories_to_file(sorted_subdirectories, subcontent_file_path)
 # 记录结束时间

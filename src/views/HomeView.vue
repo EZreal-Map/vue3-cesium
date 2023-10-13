@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-header height="5vh">Header</el-header>
+      <el-header height="5vh">Header {{ floodStore.index }}</el-header>
       <el-main style="--el-main-padding: 0">
         <cesiumContainer> </cesiumContainer>
       </el-main>
@@ -27,6 +27,19 @@ import cesiumContainer from '../components/cesiumContainer.vue'
 import echartsContainer from '../components/echartsContainer.vue'
 // import legendContainer from '../components/legendContainer.vue'
 import dashboardContaioner from '../components/dashboardContaioner.vue'
+import { useFloodStore } from '../stores/flood'
+
+const floodStore = useFloodStore()
+
+;(async () => {
+  console.log('hello start')
+  await floodStore.initSubcontents(
+    '@/../python/flood/30years/glb/subcontents.txt'
+  )
+  console.log(floodStore.subcontents)
+})()
+
+// console.log(floodStore.subcontents[150])
 </script>
 
 <style>
