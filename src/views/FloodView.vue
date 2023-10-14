@@ -2,18 +2,46 @@
   <div class="common-layout">
     <el-container>
       <el-header height="0vh">
-        <legendContainer class="legendContainer"></legendContainer>
+        <transition name="fade">
+          <legendContainer
+            v-show="stateStore.visibility"
+            class="legendContainer"
+          >
+          </legendContainer>
+        </transition>
       </el-header>
-      <el-main style="--el-main-padding: 0">
+
+      <el-main class="main" style="--el-main-padding: 0">
         <cesiumContainer> </cesiumContainer>
+        <div class="buttonPanel">
+          <el-link :underline="false">
+            <el-icon
+              v-if="stateStore.visibility"
+              size="40px"
+              @click="stateStore.negateVisibility"
+            >
+              <Bottom
+            /></el-icon>
+            <el-icon v-else size="40px" @click="stateStore.negateVisibility"
+              ><Top
+            /></el-icon>
+          </el-link>
+        </div>
       </el-main>
-      <el-footer height="20vh" style="--el-footer-padding: 0">
+
+      <el-footer
+        :class="stateStore.visibility ? 'active' : 'inactive'"
+        class="footerContainer"
+        style="--el-footer-padding: 0"
+      >
+        <!-- <div class="footerContainer"> -->
         <div class="footer-left">
           <dashboardContaioner></dashboardContaioner>
         </div>
         <div class="footer-right">
           <echartsContainer></echartsContainer>
         </div>
+        <!-- </div> -->
       </el-footer>
     </el-container>
   </div>
@@ -29,9 +57,13 @@ import echartsContainer from '../components/echartsContainer.vue'
 import legendContainer from '../components/legendContainer.vue'
 import dashboardContaioner from '../components/dashboardContaioner.vue'
 import { useFloodStore } from '../stores/flood'
+import { useStateStore } from '../stores/state'
 import { useRoute } from 'vue-router'
+import { Top, Bottom } from '@element-plus/icons-vue'
 
 const floodStore = useFloodStore()
+const stateStore = useStateStore()
+
 const route = useRoute()
 console.log('hello start :', route.params.years)
 floodStore.setYears(route.params.years)
@@ -75,5 +107,34 @@ floodStore.setYears(route.params.years)
   top: 20px;
   left: 30px;
   z-index: 10;
+}
+
+.main {
+  position: relative;
+}
+
+.buttonPanel {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.active {
+  height: 180px;
+  transition: height 1s; /* 设置高度变化的过渡效果，持续1秒 */
+}
+
+.inactive {
+  height: 0;
+  transition: height 1s; /* 设置高度变化的过渡效果，持续1秒 */
 }
 </style>

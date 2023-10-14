@@ -6,13 +6,27 @@
 import * as echarts from 'echarts'
 import { ref, onMounted, watchEffect } from 'vue'
 import { useFloodStore } from '../stores/flood'
+import { useStateStore } from '../stores/state'
 const floodStore = useFloodStore()
+const stateStore = useStateStore()
+
 const initFlag = ref(false)
+const updateEchartFlag = ref(true) // 初始值为true 避免visibility持久化为false
 onMounted(async () => {
   // 基于准备好的dom，初始化echarts实例
   const myChart = echarts.init(document.getElementById('echartsContainer'))
   // 绘制图表
   watchEffect(() => {
+    if (stateStore.visibility && updateEchartFlag.value) {
+      updateEchartFlag.value = false
+      // 启动定时器，每0.1秒调用一次 resize()
+      const ID = setInterval(() => myChart.resize(), 10)
+      // 一秒钟后停止定时器
+      setTimeout(() => {
+        clearInterval(ID) // 停止定时器
+      }, 1000)
+    }
+
     if (floodStore.initReady && !initFlag.value) {
       initFlag.value = true
       myChart.setOption({
@@ -63,7 +77,13 @@ onMounted(async () => {
 
   // 设置响应式
   window.addEventListener('resize', () => {
-    myChart.resize()
+    if (stateStore.visibility) {
+      myChart.resize()
+    } else {
+      if (!stateStore.updateEchart) {
+        updateEchartFlag.value = true // 在隐藏的情况下，屏幕动了设置 需要更重新新echarts的标志
+      }
+    }
   })
 
   myChart.on('click', function (params) {
@@ -91,18 +111,6 @@ onMounted(async () => {
       ]
     })
   })
-
-  //   watchEffect(() => {
-  //     // 修改柱状图颜色
-  //     // const dataIndex = 0
-  //     const option = myChart.getOption() // 获取当前图表配置
-  //     if () {
-
-  //   })
-  //     }
-  //     // const series = option.series[0]
-  //     // console.log(series)
-  //     // 修改柱状图颜色
 })
 </script>
 

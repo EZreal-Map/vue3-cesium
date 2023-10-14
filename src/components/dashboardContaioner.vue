@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    <div>
+    <div class="top"></div>
+    <div class="center">
       <div>
         <el-progress type="dashboard" :percentage="percentage || 0">
           <span class="percentage-value">
@@ -74,9 +75,13 @@ const stopInterval = () => {
 
 <style scoped>
 .container {
-  display: flex;
-  align-items: center; /* 垂直居中对齐 */
-  justify-content: center; /* 水平居中对齐 */
+  /* display: flex; */
+  /* align-items: center; 垂直居中对齐 */
+  /* justify-content: center; 水平居中对齐 */
   height: 100%; /* 设置容器高度 */
+}
+
+.top {
+  height: 5%;
 }
 </style>
