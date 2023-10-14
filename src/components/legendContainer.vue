@@ -15,10 +15,9 @@
 import { ref, onMounted } from 'vue'
 const canvas = ref(null) // ref 绑定dom的时候，需要放在setup里面
 onMounted(() => {
-  console.log(canvas)
+  // console.log(canvas)
   const ctx = canvas.value.getContext('2d')
-  console.log(ctx)
-
+  // console.log(ctx)
   const start_color = [149, 208, 238]
   const end_color = [10, 9, 145]
 

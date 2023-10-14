@@ -63,7 +63,7 @@ onMounted(async () => {
         )
       ),
       model: {
-        uri: `@/../python/flood/30years/glb/${num}/triangle_mesh_0.05.glb`,
+        uri: `/python/flood/${floodStore.years}/glb/${num}/triangle_mesh_0.05.glb`,
         // show: IsShow
         // preloadWhenHidden: preload
         // color: Cesium.Color.fromBytes(190,228,246,230),

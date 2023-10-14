@@ -62,7 +62,7 @@ def get_interval_index(H, intervals):
 # 主函数main()
 # 记录开始时间
 start_time = time.time()
-directory_path = './flood/50years'
+directory_path = './flood/5years'
 subdirectories = get_numeric_subdirectories(directory_path)
 # 按照数字大小排序
 sorted_subdirectories = sorted(subdirectories, key=lambda x: int(x))

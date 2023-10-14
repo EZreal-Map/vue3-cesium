@@ -3,7 +3,6 @@
     <el-container>
       <el-header height="0vh">
         <legendContainer class="legendContainer"></legendContainer>
-        {{ floodStore.index }}
       </el-header>
       <el-main style="--el-main-padding: 0">
         <cesiumContainer> </cesiumContainer>
@@ -30,17 +29,20 @@ import echartsContainer from '../components/echartsContainer.vue'
 import legendContainer from '../components/legendContainer.vue'
 import dashboardContaioner from '../components/dashboardContaioner.vue'
 import { useFloodStore } from '../stores/flood'
+import { useRoute } from 'vue-router'
 
 const floodStore = useFloodStore()
-
+const route = useRoute()
+console.log('hello start :', route.params.years)
+floodStore.setYears(route.params.years)
 ;(async () => {
-  console.log('hello start')
+  //绝对路径来解决这个问题
   await floodStore.initSubcontents(
-    '@/../python/flood/30years/glb/subcontents.txt'
+    `/python/flood/${floodStore.years}/glb/subcontents.txt`
   )
   // console.log(floodStore.subcontents)
   await floodStore.initEchartSeries(
-    '@/../python/flood/30years/glb/echartSeries.txt'
+    `/python/flood/${floodStore.years}/glb/echartSeries.txt`
   )
   // console.log(floodStore.echartSeries)
   floodStore.initReady = true
