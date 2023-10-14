@@ -33,7 +33,8 @@ onMounted(async () => {
   const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(2236714)
   viewer.scene.primitives.add(tileset)
 
-  // 调整研究区域视角
+  // 聚焦研究区域  调整研究区域视角
+  viewer.zoomTo(tileset)
   // viewer.camera.flyTo({
   //   destination: Cesium.Cartesian3.fromDegrees(113.39811, 31.699212, 4000.0), // 例如：1000
   //   orientation: {
@@ -42,7 +43,13 @@ onMounted(async () => {
   //     roll: 0.0 // 指定翻滚角度
   //   }
   // })
-  viewer.zoomTo(tileset)
+  // 清除默认鼠标左键点击事件
+  viewer.screenSpaceEventHandler.removeInputAction(
+    Cesium.ScreenSpaceEventType.LEFT_CLICK
+  )
+  viewer.screenSpaceEventHandler.removeInputAction(
+    Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+  )
   // 加载单个GLB方法
   async function loadingGLB(num, IsShow = true) {
     const position = Cesium.Cartesian3.fromDegrees(
@@ -69,9 +76,10 @@ onMounted(async () => {
         // color: Cesium.Color.fromBytes(190,228,246,230),
         // color: Cesium.Color.fromBytes(255, 255, 255, 230),
         // colorBlendAmount:0.5,
-        colorBlendMode: Cesium.Cesium3DTileColorBlendMode.HIGHLIGHT
+        colorBlendMode: Cesium.Cesium3DTileColorBlendMode.HIGHLIGHT,
         // showOutline:true,
         // silhouetteColor: Cesium.Color.RED
+        allowPicking: false
       }
     })
   }
@@ -117,48 +125,48 @@ onMounted(async () => {
   })
 
   // 新添加颜色pick模块（待更新完善）
-  // const scene = viewer.scene
-  // const context = scene.context
+  const scene = viewer.scene
+  const context = scene.context
 
-  // let readColor = false
-  // let pickPosition = null // 定义 pickPosition 变量
+  let readColor = false
+  let pickPosition = null // 定义 pickPosition 变量
 
-  // viewer.scene.camera.percentageChanged = 0.01 // 设置缩放触发阈值
-  // // 添加鼠标点击事件监听器
-  // viewer.canvas.addEventListener('click', function (event) {
-  //   readColor = true
-  //   const canvas = viewer.canvas
-  //   const rect = canvas.getBoundingClientRect()
-  //   console.log(rect)
-  //   pickPosition = new Cesium.Cartesian2(
-  //     event.clientX - rect.left,
-  //     event.clientY - rect.top
-  //   )
-  //   console.log(pickPosition)
-  //   const pickRay = viewer.scene.camera.getPickRay(pickPosition)
+  viewer.scene.camera.percentageChanged = 0.01 // 设置缩放触发阈值
+  // 添加鼠标点击事件监听器
+  viewer.canvas.addEventListener('click', function (event) {
+    readColor = true
+    const canvas = viewer.canvas
+    const rect = canvas.getBoundingClientRect()
+    console.log(rect)
+    pickPosition = new Cesium.Cartesian2(
+      event.clientX - rect.left,
+      event.clientY - rect.top
+    )
+    console.log(pickPosition)
+    const pickRay = viewer.scene.camera.getPickRay(pickPosition)
 
-  //   const cartesian = viewer.scene.globe.pick(pickRay, viewer.scene)
-  //   if (Cesium.defined(cartesian)) {
-  //     const cartographic = Cesium.Cartographic.fromCartesian(cartesian)
-  //     const longitude = Cesium.Math.toDegrees(cartographic.longitude)
-  //     const latitude = Cesium.Math.toDegrees(cartographic.latitude)
-  //     console.log('点击位置的经纬度坐标：' + longitude + ', ' + latitude)
-  //   }
-  // })
+    const cartesian = viewer.scene.globe.pick(pickRay, viewer.scene)
+    if (Cesium.defined(cartesian)) {
+      const cartographic = Cesium.Cartographic.fromCartesian(cartesian)
+      const longitude = Cesium.Math.toDegrees(cartographic.longitude)
+      const latitude = Cesium.Math.toDegrees(cartographic.latitude)
+      console.log('点击位置的经纬度坐标：' + longitude + ', ' + latitude)
+    }
+  })
 
-  // scene.postRender.addEventListener(function () {
-  //   if (readColor && pickPosition !== null) {
-  //     const pixels = context.readPixels({
-  //       x: pickPosition.x,
-  //       y: pickPosition.y,
-  //       width: 1,
-  //       height: 1
-  //     })
-  //     console.log('鼠标点击位置的颜色值:', pixels)
-  //     readColor = false
-  //     pickPosition = null // 重置 pickPosition
-  //   }
-  // })
+  scene.postRender.addEventListener(function () {
+    if (readColor && pickPosition !== null) {
+      const pixels = context.readPixels({
+        x: pickPosition.x,
+        y: pickPosition.y,
+        width: 1,
+        height: 1
+      })
+      console.log('鼠标点击位置的颜色值:', pixels)
+      readColor = false
+      pickPosition = null // 重置 pickPosition
+    }
+  })
 })
 </script>
 

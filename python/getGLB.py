@@ -59,10 +59,25 @@ def get_interval_index(H, intervals):
     # 如果H小于所有区间的第一个值，则属于第一个区间
     return 0
 
+def get_gamma_color(H):
+    start_color = [149, 208, 238]
+    end_color = [10, 9, 145]
+    delta_color = [-139, -199, -93] # end_color-start_color
+    Hmax = 10.01
+    Hmin = 0.01
+    if H > Hmax:
+        return end_color
+    elif H < Hmin:
+        return [255, 255, 255]
+    else:
+        h = (H-Hmin)/(Hmax - Hmin) # 归一化
+        return [round(item * h**(1/2.2) + start_color[index]) for index, item in enumerate(delta_color)]
+    
+
 # 主函数main()
 # 记录开始时间
 start_time = time.time()
-directory_path = './flood/5years'
+directory_path = './flood/30years'
 subdirectories = get_numeric_subdirectories(directory_path)
 # 按照数字大小排序
 sorted_subdirectories = sorted(subdirectories, key=lambda x: int(x))
@@ -130,12 +145,12 @@ for directory in sorted_subdirectories:
     # faces = [[0, 1, 2],[0, 1, 3]]
 
     rectify_vertices = np.array(vertices)
-    position_min_x = float('inf')
-    position_min_y = float('inf')
-    position_min_z = float('inf')
-    position_max_x = 0
-    position_max_y = 0
-    position_max_z = 0
+    # position_min_x = float('inf')
+    # position_min_y = float('inf')
+    # position_min_z = float('inf')
+    # position_max_x = 0
+    # position_max_y = 0
+    # position_max_z = 0
     for i, value in enumerate(faces):
         # print(value)
         for index in value:
@@ -163,6 +178,7 @@ for directory in sorted_subdirectories:
     # longitude, latitude = utm113(utm_x, utm_y, inverse=True)
     # 中心点修正 ---> utm_x: 505817.0445, utm_y: 3509140.655, Height: 61.0309417
     # 中心点修正 ---> longitude: 113.39592268502284, latitude: 31.704985763068212, Height: 61.0309417
+    # 固定下来 -> python 与 cesium 需要统一
     longitude = 113.39592268502284
     latitude = 31.704985763068212
     height = 61.0309417
@@ -191,8 +207,12 @@ for directory in sorted_subdirectories:
             clearFaces.append(faces[i])
 
             # 获取对应 H 的颜色表示 rgb
+            # 方法一： 旧方法-interval区间法获取H对应的颜色
             index = get_interval_index(h, intervals)
             rgbList = gradient_colors[index]
+            # 方法二： 直接连续计算获取颜色 （非线性--gamma幂函数）
+            # rgbList = get_gamma_color(h)
+
             # 伽马值γ < 1的情况有时被称作编码伽马值（encoding gamma），
             # 而执行这个编码运算所使用上述幂定律的过程也叫做伽马压缩（gamma compression）；
             # 相对地，伽马值γ > 1的情况有时也被称作解码伽马值（decoding gamma），

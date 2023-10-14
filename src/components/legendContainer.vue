@@ -1,50 +1,119 @@
 <template>
-  <div>
-    <div class="legend-container">
-      <canvas ref="canvas" width="70" height="253"></canvas>
-    </div>
-    <div class="legend-container legend-container-right">
-      <div class="legend-text" v-for="num in [5, 4, 3, 2, 0.01]" :key="num">
-        {{ num }}
+  <div class="legend-container">
+    <div class="legend" ref="legend">
+      <div
+        v-for="(item, index) in legendItems"
+        :key="index"
+        class="legend-item"
+      >
+        <div class="color-box" :style="{ backgroundColor: item.color }"></div>
+        <div class="label-text">{{ item.label }}</div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script>
 import { ref, onMounted } from 'vue'
-const canvas = ref(null) // ref 绑定dom的时候，需要放在setup里面
-onMounted(() => {
-  // console.log(canvas)
-  const ctx = canvas.value.getContext('2d')
-  // console.log(ctx)
-  const start_color = [149, 208, 238]
-  const end_color = [10, 9, 145]
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.value.height)
-  gradient.addColorStop(1, `rgb(${start_color.join(',')})`)
-  gradient.addColorStop(0, `rgb(${end_color.join(',')})`)
+export default {
+  setup() {
+    const intervals = [
+      0,
+      0.01,
+      0.25,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3,
+      3.5,
+      4,
+      4.5,
+      5,
+      7.5,
+      10,
+      Infinity
+    ]
+    const length = intervals.length
+    const startColor = [149, 208, 238]
+    const endColor = [10, 9, 145]
 
-  ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, canvas.value.width, canvas.value.height)
-})
+    const legendItems = ref([])
+
+    onMounted(() => {
+      const gradientColors = generateColorGradient(
+        intervals.length - 1,
+        endColor,
+        startColor
+      )
+
+      legendItems.value = intervals
+        .slice(1)
+        .map((end, index) => {
+          const start = intervals[index]
+          return {
+            color: gradientColors[index],
+            label: `${start.toFixed(2)} - ${end - 0.01}`
+          }
+        })
+        .reverse()
+
+      // 修改 label第一个lable > intervals倒数第二个数(最大值)
+      legendItems.value[0].label = `> ${intervals[length - 2]}`
+      legendItems.value[length - 2].label = `< ${intervals[1]}`
+    })
+
+    function generateColorGradient(numSegments, startColor, endColor) {
+      const gradientColors = []
+      for (let i = numSegments - 1; i >= 0; i--) {
+        const t = i / (numSegments - 1)
+        const r = Math.round(startColor[0] + (endColor[0] - startColor[0]) * t)
+        const g = Math.round(startColor[1] + (endColor[1] - startColor[1]) * t)
+        const b = Math.round(startColor[2] + (endColor[2] - startColor[2]) * t)
+        gradientColors.push(`rgb(${r}, ${g}, ${b})`)
+      }
+      return gradientColors
+    }
+
+    return {
+      legendItems
+    }
+  }
+}
 </script>
 
-<style scoped>
+<style>
 .legend-container {
-  display: inline-block;
-  vertical-align: top;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 20px;
+  border: 1px solid #ccc;
+  max-width: 180px;
 }
 
-.legend-text {
-  color: black;
+.legend {
+  color: #000;
+  display: flex;
+  flex-direction: column;
   font-size: 16px;
-  background-color: rgba(255, 255, 255, 0.5);
-  padding-bottom: 40px;
-  font-weight: 700;
 }
 
-.legend-text:last-child {
-  padding-bottom: 0;
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.color-box {
+  width: 50px;
+  height: 20px;
+  border: 1px solid #000;
+  margin-right: 10px;
+}
+
+.label-text {
+  width: 80px;
+  white-space: pre; /* 保留连续的空格 */
 }
 </style>
