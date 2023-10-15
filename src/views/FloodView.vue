@@ -93,14 +93,14 @@ floodStore.setYears(route.params.years)
   width: 10%;
   height: 100%;
   float: left;
-  background-color: #ccc;
+  background-color: rgb(149, 208, 238);
 }
 
 .footer-right {
   width: 90%;
   height: 100%;
   float: right;
-  background-color: #ddd;
+  background-color: rgb(149, 208, 238);
 }
 .legendContainer {
   position: absolute;

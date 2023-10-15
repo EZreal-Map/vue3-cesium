@@ -5,8 +5,11 @@
 <script setup>
 import * as Cesium from 'cesium'
 import { onMounted, watchEffect } from 'vue'
-import { useFloodStore } from '../stores/flood'
+import { useFloodStore } from '@/stores/flood'
 const floodStore = useFloodStore()
+import { ElMessage } from 'element-plus'
+import { useColorStore } from '@/stores/color'
+const colorStore = useColorStore()
 
 onMounted(async () => {
   Cesium.Ion.defaultAccessToken =
@@ -133,7 +136,8 @@ onMounted(async () => {
 
   viewer.scene.camera.percentageChanged = 0.01 // 设置缩放触发阈值
   // 添加鼠标点击事件监听器
-  viewer.canvas.addEventListener('click', function (event) {
+  viewer.canvas.addEventListener('contextmenu', function (event) {
+    event.preventDefault() // 阻止右键菜单的默认行为
     readColor = true
     const canvas = viewer.canvas
     const rect = canvas.getBoundingClientRect()
@@ -162,11 +166,91 @@ onMounted(async () => {
         width: 1,
         height: 1
       })
-      console.log('鼠标点击位置的颜色值:', pixels)
+      // r = pixels[0]
+      const rgbArray = Object.values(pixels).slice(0, 3)
+      console.log(colorStore.gradientColors)
+      let rgbRange = findColorIndices(rgbArray, [
+        [255, 255, 255],
+        ...colorStore.gradientColors
+      ])
+      const min = Math.min(...Object.values(rgbRange))
+      const sumOfDeviations = rgbRange.reduce((acc, val) => acc + val - min, 0)
+      console.log('Sum of Absolute Deviations:', sumOfDeviations)
+
+      console.log('Red Range:', rgbRange[0])
+      console.log('Green Range:', rgbRange[1])
+      console.log('Blue Range:', rgbRange[2])
+      console.log('鼠标点击位置的颜色值:', pixels[0])
+      console.log('鼠标点击位置的颜色值:', pixels[1])
+      console.log('鼠标点击位置的颜色值:', pixels[2])
+      console.log(min)
+      const index = colorStore.length - min - 1
+      console.log(index)
+      ElMessage({
+        message: `${colorStore?.legendItems[index]?.label} `,
+        type: 'success'
+      })
+
       readColor = false
       pickPosition = null // 重置 pickPosition
     }
   })
+
+  function findColorIndices(rgbColor, gradientColors) {
+    let [r, g, b] = rgbColor
+
+    let rIndices = []
+    let gIndices = []
+    let bIndices = []
+
+    for (let color of gradientColors) {
+      rIndices.push(color[0])
+      gIndices.push(color[1])
+      bIndices.push(color[2])
+    }
+
+    let rRange = 0
+    let gRange = 0
+    let bRange = 0
+
+    for (let i = 1; i < rIndices.length; i++) {
+      if (r <= rIndices[rIndices.length - 1]) {
+        rRange = rIndices.length
+        break
+      }
+
+      if (rIndices[i - 1] > r && r >= rIndices[i]) {
+        rRange = i
+        break
+      }
+    }
+
+    for (let i = 1; i < gIndices.length; i++) {
+      if (g <= gIndices[gIndices.length - 1]) {
+        gRange = gIndices.length
+        break
+      }
+
+      if (gIndices[i - 1] > g && g >= gIndices[i]) {
+        gRange = i
+        break
+      }
+    }
+
+    for (let i = 1; i < bIndices.length; i++) {
+      if (b <= bIndices[bIndices.length - 1]) {
+        bRange = bIndices.length
+        break
+      }
+
+      if (bIndices[i - 1] > b && b >= bIndices[i]) {
+        bRange = i
+        break
+      }
+    }
+
+    return [rRange, gRange, bRange]
+  }
 })
 </script>
 

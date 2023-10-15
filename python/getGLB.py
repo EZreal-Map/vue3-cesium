@@ -88,7 +88,7 @@ S_data = read_data_between_brackets(S_file_path)  # 关键数据 DEM
 
 # 生成颜色渐变数组，从浅蓝色到深蓝色
 intervals = [0, 0.01,0.25, 0.50, 1.0, 1.50, 2.0, 2.5,
-             3, 3.5, 4, 4.5, 5, 7.5, 10, float('inf')]
+             3, 3.5, 4, 4.5 float('inf')]
 num_segments = len(intervals)-1
 start_color = [149, 208, 238]
 end_color = [10, 9, 145]
