@@ -39,7 +39,7 @@ export const useColorStore = defineStore('color', () => {
     endColor,
     startColor
   )
-  console.log('gradientColors:', gradientColors)
+  // console.log('gradientColors:', gradientColors)
 
   legendItems.value = intervals
     .slice(1)
@@ -56,10 +56,67 @@ export const useColorStore = defineStore('color', () => {
   legendItems.value[0].label = `> ${intervals[length.value - 2]}`
   legendItems.value[length.value - 2].label = `< ${intervals[1]}`
 
+  function findColorIndices(rgbColor, gradientColors) {
+    let [r, g, b] = rgbColor
+
+    let rIndices = []
+    let gIndices = []
+    let bIndices = []
+
+    for (let color of gradientColors) {
+      rIndices.push(color[0])
+      gIndices.push(color[1])
+      bIndices.push(color[2])
+    }
+
+    let rRange = 0
+    let gRange = 0
+    let bRange = 0
+
+    for (let i = 1; i < rIndices.length; i++) {
+      if (r <= rIndices[rIndices.length - 1]) {
+        rRange = rIndices.length
+        break
+      }
+
+      if (rIndices[i - 1] > r && r >= rIndices[i]) {
+        rRange = i
+        break
+      }
+    }
+
+    for (let i = 1; i < gIndices.length; i++) {
+      if (g <= gIndices[gIndices.length - 1]) {
+        gRange = gIndices.length
+        break
+      }
+
+      if (gIndices[i - 1] > g && g >= gIndices[i]) {
+        gRange = i
+        break
+      }
+    }
+
+    for (let i = 1; i < bIndices.length; i++) {
+      if (b <= bIndices[bIndices.length - 1]) {
+        bRange = bIndices.length
+        break
+      }
+
+      if (bIndices[i - 1] > b && b >= bIndices[i]) {
+        bRange = i
+        break
+      }
+    }
+
+    return [rRange, gRange, bRange]
+  }
+
   return {
     intervals,
     length,
     gradientColors,
-    legendItems
+    legendItems,
+    findColorIndices
   }
 })

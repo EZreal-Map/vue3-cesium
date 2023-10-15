@@ -10,6 +10,8 @@ const floodStore = useFloodStore()
 import { ElMessage } from 'element-plus'
 import { useColorStore } from '@/stores/color'
 const colorStore = useColorStore()
+import { useStateStore } from '@/stores/state'
+const stateStore = useStateStore()
 
 onMounted(async () => {
   Cesium.Ion.defaultAccessToken =
@@ -33,11 +35,11 @@ onMounted(async () => {
     intensity: 10
   })
   // 加载建筑白膜
-  const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(2236714)
-  viewer.scene.primitives.add(tileset)
-
+  const building = await Cesium.Cesium3DTileset.fromIonAssetId(2236714)
+  viewer.scene.primitives.add(building)
+  // building.show = false
   // 聚焦研究区域  调整研究区域视角
-  viewer.zoomTo(tileset)
+  viewer.zoomTo(building)
   // viewer.camera.flyTo({
   //   destination: Cesium.Cartesian3.fromDegrees(113.39811, 31.699212, 4000.0), // 例如：1000
   //   orientation: {
@@ -122,7 +124,13 @@ onMounted(async () => {
     }
   }
   watchEffect(() => {
-    if (floodPrimitivesGLB) {
+    if (building) {
+      // console.log(building)
+      // console.log(stateStore.showBuliding)
+      building.show = stateStore.showBuliding
+    }
+
+    if (floodPrimitivesGLB && floodStore.index != 0) {
       showFloodPrimitivesGLB(floodStore.index)
     }
   })
@@ -169,7 +177,7 @@ onMounted(async () => {
       // r = pixels[0]
       const rgbArray = Object.values(pixels).slice(0, 3)
       console.log(colorStore.gradientColors)
-      let rgbRange = findColorIndices(rgbArray, [
+      let rgbRange = colorStore.findColorIndices(rgbArray, [
         [255, 255, 255],
         ...colorStore.gradientColors
       ])
@@ -188,69 +196,13 @@ onMounted(async () => {
       console.log(index)
       ElMessage({
         message: `${colorStore?.legendItems[index]?.label} `,
-        type: 'success'
+        type: sumOfDeviations < 2.1 ? 'success' : 'warning'
       })
 
       readColor = false
       pickPosition = null // 重置 pickPosition
     }
   })
-
-  function findColorIndices(rgbColor, gradientColors) {
-    let [r, g, b] = rgbColor
-
-    let rIndices = []
-    let gIndices = []
-    let bIndices = []
-
-    for (let color of gradientColors) {
-      rIndices.push(color[0])
-      gIndices.push(color[1])
-      bIndices.push(color[2])
-    }
-
-    let rRange = 0
-    let gRange = 0
-    let bRange = 0
-
-    for (let i = 1; i < rIndices.length; i++) {
-      if (r <= rIndices[rIndices.length - 1]) {
-        rRange = rIndices.length
-        break
-      }
-
-      if (rIndices[i - 1] > r && r >= rIndices[i]) {
-        rRange = i
-        break
-      }
-    }
-
-    for (let i = 1; i < gIndices.length; i++) {
-      if (g <= gIndices[gIndices.length - 1]) {
-        gRange = gIndices.length
-        break
-      }
-
-      if (gIndices[i - 1] > g && g >= gIndices[i]) {
-        gRange = i
-        break
-      }
-    }
-
-    for (let i = 1; i < bIndices.length; i++) {
-      if (b <= bIndices[bIndices.length - 1]) {
-        bRange = bIndices.length
-        break
-      }
-
-      if (bIndices[i - 1] > b && b >= bIndices[i]) {
-        bRange = i
-        break
-      }
-    }
-
-    return [rRange, gRange, bRange]
-  }
 })
 </script>
 

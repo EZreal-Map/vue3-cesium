@@ -14,18 +14,34 @@
       <el-main class="main" style="--el-main-padding: 0">
         <cesiumContainer> </cesiumContainer>
         <div class="buttonPanel">
-          <el-link :underline="false">
-            <el-icon
-              v-if="stateStore.visibility"
-              size="40px"
-              @click="stateStore.negateVisibility"
-            >
-              <Bottom
-            /></el-icon>
-            <el-icon v-else size="40px" @click="stateStore.negateVisibility"
-              ><Top
-            /></el-icon>
-          </el-link>
+          <div class="buttonPanel-left">
+            <el-link :underline="false">
+              <el-icon
+                v-if="stateStore.visibility"
+                size="40px"
+                @click="stateStore.negateVisibility"
+              >
+                <Bottom
+              /></el-icon>
+              <el-icon v-else size="40px" @click="stateStore.negateVisibility"
+                ><Top
+              /></el-icon>
+            </el-link>
+          </div>
+          <div class="buttonPanel-right">
+            <el-link :underline="false">
+              <el-icon
+                v-if="stateStore.showBuliding"
+                size="40px"
+                @click="stateStore.negateshowBuliding"
+              >
+                <View
+              /></el-icon>
+              <el-icon v-else size="40px" @click="stateStore.negateshowBuliding"
+                ><Hide
+              /></el-icon>
+            </el-link>
+          </div>
         </div>
       </el-main>
 
@@ -59,7 +75,7 @@ import dashboardContaioner from '../components/dashboardContaioner.vue'
 import { useFloodStore } from '../stores/flood'
 import { useStateStore } from '../stores/state'
 import { useRoute } from 'vue-router'
-import { Top, Bottom } from '@element-plus/icons-vue'
+import { Top, Bottom, View, Hide } from '@element-plus/icons-vue'
 
 const floodStore = useFloodStore()
 const stateStore = useStateStore()
@@ -77,8 +93,8 @@ floodStore.setYears(route.params.years)
     `/python/flood/${floodStore.years}/glb/echartSeries.txt`
   )
   // console.log(floodStore.echartSeries)
-  floodStore.initReady = true
-  console.log(floodStore.initReady)
+  floodStore.initReady = true // 子文件数据+echartSeries数据加载完成
+  // console.log(floodStore.initReady)
 })()
 
 // console.log(floodStore.subcontents[150])
@@ -113,9 +129,16 @@ floodStore.setYears(route.params.years)
   position: relative;
 }
 
-.buttonPanel {
+.buttonPanel-left {
+  display: inline-block;
   position: absolute;
   left: 10px;
+  bottom: 10px;
+}
+.buttonPanel-right {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
   bottom: 10px;
 }
 

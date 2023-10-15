@@ -88,7 +88,7 @@ S_data = read_data_between_brackets(S_file_path)  # 关键数据 DEM
 
 # 生成颜色渐变数组，从浅蓝色到深蓝色
 intervals = [0, 0.01,0.25, 0.50, 1.0, 1.50, 2.0, 2.5,
-             3, 3.5, 4, 4.5 float('inf')]
+             3, 3.5, 4, 4.5,float('inf')]
 num_segments = len(intervals)-1
 start_color = [149, 208, 238]
 end_color = [10, 9, 145]
@@ -120,7 +120,7 @@ with open( os.path.join(
 utm113 = Proj("+proj=tmerc +lon_0=113.35 +y_0=0 +x_0=500000 +ellps=IAU76 \
 +towgs84=-7.849095,18.661172,12.682502,0.809388,-1.667217,-56.719783,-3.30421e-007 +units=m +no_defs")
 
-threshold = 0.05 # 选择H高度 阈值
+threshold = 0.01 # 选择H高度 阈值
 count = 1 # 打印进度
 lengthStatistics =[] # 保存阈值筛选后的三角网格数量
 
