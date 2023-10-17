@@ -35,9 +35,9 @@ def read_data_between_brackets(file_path):
 
 def generate_color_gradient(num_segments, start_color, end_color):
     # 获取颜色渐变数组
-    gradient_colors = [(255,255,255)]
-    for i in range(num_segments-1):
-        t = i / (num_segments - 1)
+    gradient_colors = []
+    for i in range(num_segments):
+        t = i / (num_segments )
         r = start_color[0] + (end_color[0] - start_color[0]) * t
         g = start_color[1] + (end_color[1] - start_color[1]) * t
         b = start_color[2] + (end_color[2] - start_color[2]) * t
@@ -52,12 +52,9 @@ def get_interval_index(H, intervals):
     #              3, 3.5, 4, 4.5, 5, 7.5, 10, float('inf')]
 
     # 循环遍历所有区间，找到第一个H小于等于的区间，然后返回对应的索引
-    for i in range(len(intervals)):
-        if H <= intervals[i+1]:
+    for i in range(len(intervals)-1):
+        if H < intervals[i+1]:
             return i
-
-    # 如果H小于所有区间的第一个值，则属于第一个区间
-    return 0
 
 def get_gamma_color(H):
     start_color = [149, 208, 238]
@@ -87,13 +84,13 @@ S_file_path = os.path.join(directory_path, sorted_subdirectories[1], 'S')
 S_data = read_data_between_brackets(S_file_path)  # 关键数据 DEM
 
 # 生成颜色渐变数组，从浅蓝色到深蓝色
-intervals = [0, 0.01,0.25, 0.50, 1.0, 1.50, 2.0, 2.5,
-             3, 3.5, 4, 4.5,float('inf')]
-num_segments = len(intervals)-1
+intervals = [0.01,0.25, 0.50, 1.0, 1.50, 2.0, 2.5,
+             3, 3.5, 4, float('inf')]
 start_color = [149, 208, 238]
 end_color = [10, 9, 145]
 gradient_colors = generate_color_gradient(
-    num_segments, start_color, end_color)
+    len(intervals)-1, start_color, end_color)  # gradient_colors的长度比intervals长度小1
+print(gradient_colors)
 # 定义一个空列表用于存储面信息
 faces = []
 # 定义一个空列表用于存储顶点信息
@@ -135,7 +132,7 @@ for directory in sorted_subdirectories:
     # 检查文件夹路径是否存在，如果不存在则创建它
     if not os.path.exists(glb_outputfile_directory):
         os.makedirs(glb_outputfile_directory)
-    glb_outputfile_path = os.path.join(glb_outputfile_directory, 'triangle_mesh_' + str(threshold) + '.glb')
+    glb_outputfile_path = os.path.join(glb_outputfile_directory, 'triangle_mesh.glb')
     # 从不同时刻文件读取数据并拆分成顶点坐标和颜色信息
     # data = np.loadtxt(Hrgb_inputfile_path, delimiter=',')
     # H = data[:, :1]  # 第一列是H
@@ -183,8 +180,8 @@ for directory in sorted_subdirectories:
     latitude = 31.704985763068212
     height = 61.0309417
     # 修改vertices，纠正glb中心点
-    position_file_path = os.path.join(
-        directory_path, directory, 'center_point_position_'+str(threshold)+'.txt')
+    # position_file_path = os.path.join(
+    #     directory_path, directory, 'center_point_position_'+str(threshold)+'.txt')
     # 打开文件并读取内容
     # with open(position_file_path, 'r') as file:
     #     line = file.readline().strip()  # 读取并去除首尾空白字符
@@ -209,6 +206,8 @@ for directory in sorted_subdirectories:
             # 获取对应 H 的颜色表示 rgb
             # 方法一： 旧方法-interval区间法获取H对应的颜色
             index = get_interval_index(h, intervals)
+            # if (index == 0):
+            #     print(index)
             rgbList = gradient_colors[index]
             # 方法二： 直接连续计算获取颜色 （非线性--gamma幂函数）
             # rgbList = get_gamma_color(h)

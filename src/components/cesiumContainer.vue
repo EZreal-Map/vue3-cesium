@@ -75,7 +75,7 @@ onMounted(async () => {
         )
       ),
       model: {
-        uri: `/python/flood/${floodStore.years}/glb/${num}/triangle_mesh_0.05.glb`,
+        uri: `/python/flood/${floodStore.years}/glb/${num}/triangle_mesh.glb`,
         // show: IsShow
         // preloadWhenHidden: preload
         // color: Cesium.Color.fromBytes(190,228,246,230),
@@ -192,7 +192,7 @@ onMounted(async () => {
       console.log('鼠标点击位置的颜色值:', pixels[1])
       console.log('鼠标点击位置的颜色值:', pixels[2])
       console.log(min)
-      const index = colorStore.length - min - 1
+      const index = colorStore.length - min
       console.log(index)
       ElMessage({
         message: `${colorStore?.legendItems[index]?.label} `,

@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 
 export const useColorStore = defineStore('color', () => {
   const intervals = [
-    0,
     0.01,
     0.25,
     0.5,
@@ -54,7 +53,7 @@ export const useColorStore = defineStore('color', () => {
 
   // 修改 label第一个lable > intervals倒数第二个数(最大值)
   legendItems.value[0].label = `> ${intervals[length.value - 2]}`
-  legendItems.value[length.value - 2].label = `< ${intervals[1]}`
+  // legendItems.value[length.value - 2].label = `< ${intervals[1]}`
 
   function findColorIndices(rgbColor, gradientColors) {
     let [r, g, b] = rgbColor
