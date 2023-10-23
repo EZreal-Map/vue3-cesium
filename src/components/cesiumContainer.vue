@@ -40,12 +40,32 @@ onMounted(async () => {
   // building.show = false
   // 聚焦研究区域  调整研究区域视角
   viewer.zoomTo(building)
+  // 远视俯视图
   // viewer.camera.flyTo({
-  //   destination: Cesium.Cartesian3.fromDegrees(113.39811, 31.699212, 4000.0), // 例如：1000
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     113.39400394363808,
+  //     31.705119027237743,
+  //     2639.3988637142484
+  //   ),
   //   orientation: {
-  //     heading: Cesium.Math.toRadians(0.0), // 指定航向角度
-  //     pitch: Cesium.Math.toRadians(-90.0), // 指定俯仰角度
-  //     roll: 0.0 // 指定翻滚角度
+  //     // eslint-disable-next-line no-loss-of-precision
+  //     heading: Cesium.Math.toRadians(18.19266053048595033),
+  //     pitch: Cesium.Math.toRadians(-90),
+  //     roll: 0.0
+  //   }
+  // })
+  // 近视俯视图
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     113.3937990209361,
+  //     31.701736064551564,
+  //     873.53433486133
+  //   ),
+  //   orientation: {
+  //     // eslint-disable-next-line no-loss-of-precision
+  //     heading: Cesium.Math.toRadians(18.19266053048595033),
+  //     pitch: Cesium.Math.toRadians(-90),
+  //     roll: 0.0
   //   }
   // })
   // 清除默认鼠标左键点击事件
@@ -192,7 +212,7 @@ onMounted(async () => {
       console.log('鼠标点击位置的颜色值:', pixels[1])
       console.log('鼠标点击位置的颜色值:', pixels[2])
       console.log(min)
-      const index = colorStore.length - min
+      const index = colorStore.length - min - 1
       console.log(index)
       ElMessage({
         message: `${colorStore?.legendItems[index]?.label} `,

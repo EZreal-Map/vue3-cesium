@@ -2,20 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useColorStore = defineStore('color', () => {
-  const intervals = [
-    0.01,
-    0.25,
-    0.5,
-    1.0,
-    1.5,
-    2.0,
-    2.5,
-    3,
-    3.5,
-    4,
-    4.5,
-    Infinity
-  ]
+  const intervals = [0.01, 0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3, 3.5, 4, Infinity]
   const length = ref(intervals.length)
   const startColor = [149, 208, 238]
   const endColor = [10, 9, 145]

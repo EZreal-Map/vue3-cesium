@@ -74,7 +74,7 @@ def get_gamma_color(H):
 # 主函数main()
 # 记录开始时间
 start_time = time.time()
-directory_path = './flood/30years'
+directory_path = './flood/30years/openForm'
 subdirectories = get_numeric_subdirectories(directory_path)
 # 按照数字大小排序
 sorted_subdirectories = sorted(subdirectories, key=lambda x: int(x))
@@ -90,7 +90,7 @@ start_color = [149, 208, 238]
 end_color = [10, 9, 145]
 gradient_colors = generate_color_gradient(
     len(intervals)-1, start_color, end_color)  # gradient_colors的长度比intervals长度小1
-print(gradient_colors)
+# print(gradient_colors)
 # 定义一个空列表用于存储面信息
 faces = []
 # 定义一个空列表用于存储顶点信息
@@ -98,7 +98,7 @@ vertices = []
 
 # 打开并读取文件
 with open( os.path.join(
-    directory_path, '../mesh_1108.2dm'), 'r') as file:
+    directory_path, '../../mesh_1108.2dm'), 'r') as file:
     # 逐行读取文件内容
     for line in file:
         # 如果行以'E3T'开头，提取第3到5个数，并将其转为整数后减1（因为索引从0开始）
@@ -127,12 +127,14 @@ for directory in sorted_subdirectories:
     # Hrgb_inputfile_path = os.path.join(
     #     directory_path, directory, 'Hrgb.txt')
     glb_outputfile_directory = os.path.join(
-        directory_path, 'glb', directory)
+        directory_path, '../glb', directory)
     
     # 检查文件夹路径是否存在，如果不存在则创建它
     if not os.path.exists(glb_outputfile_directory):
         os.makedirs(glb_outputfile_directory)
+    
     glb_outputfile_path = os.path.join(glb_outputfile_directory, 'triangle_mesh.glb')
+    print(glb_outputfile_path)
     # 从不同时刻文件读取数据并拆分成顶点坐标和颜色信息
     # data = np.loadtxt(Hrgb_inputfile_path, delimiter=',')
     # H = data[:, :1]  # 第一列是H
