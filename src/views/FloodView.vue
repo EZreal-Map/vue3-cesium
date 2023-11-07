@@ -9,6 +9,12 @@
           >
           </legendContainer>
         </transition>
+        <transition name="fade">
+          <selectContainer
+            class="selectContainer"
+            v-show="stateStore.visibility"
+          ></selectContainer>
+        </transition>
       </el-header>
 
       <el-main class="main" style="--el-main-padding: 0">
@@ -72,6 +78,7 @@ import cesiumContainer from '../components/cesiumContainer.vue'
 import echartsContainer from '../components/echartsContainer.vue'
 import legendContainer from '../components/legendContainer.vue'
 import dashboardContaioner from '../components/dashboardContaioner.vue'
+import selectContainer from '../components/selectContainer.vue'
 import { useFloodStore } from '../stores/flood'
 import { useStateStore } from '../stores/state'
 import { useRoute } from 'vue-router'
@@ -122,6 +129,13 @@ floodStore.setYears(route.params.years)
   position: absolute;
   top: 20px;
   left: 30px;
+  z-index: 10;
+}
+
+.selectContainer {
+  position: absolute;
+  top: 20px;
+  right: 30px;
   z-index: 10;
 }
 

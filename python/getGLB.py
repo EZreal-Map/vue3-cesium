@@ -72,7 +72,7 @@ def get_gamma_color(H):
     
 def isBuildingBoundary(faces):
     for item in faces:
-        if(rectify_vertices[item][2] > 10):
+        if(rectify_vertices[item][2] > 15):
             return False
     return True
 
