@@ -70,6 +70,11 @@ def get_gamma_color(H):
         h = (H-Hmin)/(Hmax - Hmin) # 归一化
         return [round(item * h**(1/2.2) + start_color[index]) for index, item in enumerate(delta_color)]
     
+def isBuildingBoundary(faces):
+    for item in faces:
+        if(rectify_vertices[item][2] > 10):
+            return False
+    return True
 
 # 主函数main()
 # 记录开始时间
@@ -202,9 +207,8 @@ for directory in sorted_subdirectories:
     clearFaces = []
     clearFacesColor = []
     for i, h in enumerate(H):
-        if(h > threshold):
-            clearFaces.append(faces[i])
-
+        if(h > threshold and isBuildingBoundary(faces[i])):          
+            clearFaces.append(faces[i])  
             # 获取对应 H 的颜色表示 rgb
             # 方法一： 旧方法-interval区间法获取H对应的颜色
             index = get_interval_index(h, intervals)
@@ -245,13 +249,13 @@ for directory in sorted_subdirectories:
 
 # 保存子目录为directory_path = '/flood/30years/glb' 里面的subcontent.txt文件
 subcontent_file_path = os.path.join(
-    directory_path, 'glb/subcontents.txt')
+    directory_path, '../glb/subcontents.txt')
 # 调用函数，将子目录名称写入 subcontent.txt 文件
 write_subdirectories_to_file(sorted_subdirectories, subcontent_file_path)
 
 # 借用写子目录函数，保存lengthStatistics
 lengthStatistics_file_path = os.path.join(
-    directory_path, 'glb/echartSeries.txt')
+    directory_path, '../glb/echartSeries.txt')
 # 调用函数，将子目录名称写入 subcontent.txt 文件
 write_subdirectories_to_file(lengthStatistics, lengthStatistics_file_path)
 
