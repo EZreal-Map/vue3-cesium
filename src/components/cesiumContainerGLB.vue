@@ -40,34 +40,7 @@ onMounted(async () => {
   // building.show = false
   // 聚焦研究区域  调整研究区域视角
   viewer.zoomTo(building)
-  // 远视俯视图
-  // viewer.camera.flyTo({
-  //   destination: Cesium.Cartesian3.fromDegrees(
-  //     113.39400394363808,
-  //     31.705119027237743,
-  //     2639.3988637142484
-  //   ),
-  //   orientation: {
-  //     // eslint-disable-next-line no-loss-of-precision
-  //     heading: Cesium.Math.toRadians(18.19266053048595033),
-  //     pitch: Cesium.Math.toRadians(-90),
-  //     roll: 0.0
-  //   }
-  // })
-  // 近视俯视图
-  // viewer.camera.flyTo({
-  //   destination: Cesium.Cartesian3.fromDegrees(
-  //     113.3937990209361,
-  //     31.701736064551564,
-  //     873.53433486133
-  //   ),
-  //   orientation: {
-  //     // eslint-disable-next-line no-loss-of-precision
-  //     heading: Cesium.Math.toRadians(18.19266053048595033),
-  //     pitch: Cesium.Math.toRadians(-90),
-  //     roll: 0.0
-  //   }
-  // })
+
   // 清除默认鼠标左键点击事件
   viewer.screenSpaceEventHandler.removeInputAction(
     Cesium.ScreenSpaceEventType.LEFT_CLICK
@@ -75,19 +48,20 @@ onMounted(async () => {
   viewer.screenSpaceEventHandler.removeInputAction(
     Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
   )
+
+  const GLBPosition = Cesium.Cartesian3.fromDegrees(
+    113.39592268502284,
+    31.704985763068212,
+    61.0309417
+  )
   // 加载单个GLB方法
   async function loadingGLB(num, IsShow = true) {
-    const position = Cesium.Cartesian3.fromDegrees(
-      113.39592268502284,
-      31.704985763068212,
-      61.0309417
-    )
     return viewer.entities.add({
       name: num,
       show: IsShow,
-      position: position,
+      position: GLBPosition,
       orientation: Cesium.Transforms.headingPitchRollQuaternion(
-        position,
+        GLBPosition,
         new Cesium.HeadingPitchRoll(
           Cesium.Math.toRadians(0),
           Cesium.Math.toRadians(90),
@@ -110,9 +84,9 @@ onMounted(async () => {
   }
   // 预加载按钮模块
   // 用于建立索引和 tileset 的关系 ***重要变量***
-  let floodPrimitivesGLB = {}
+  let floodPrimitivesGLB = []
   async function renderTilesetWithAnimationGLB(subcontents) {
-    floodPrimitivesGLB = {}
+    floodPrimitivesGLB = []
     // 异步加载 tileset 并建立映射关系
     await Promise.all(
       subcontents.map(async (item, index) => {
@@ -143,14 +117,15 @@ onMounted(async () => {
       floodPrimitivesGLB[index - 1].show = true
     }
   }
-  watchEffect(() => {
+
+  watchEffect(async () => {
     if (building) {
       // console.log(building)
       // console.log(stateStore.showBuliding)
       building.show = stateStore.showBuliding
     }
 
-    if (floodPrimitivesGLB && floodStore.index != 0) {
+    if (floodStore.index != 0) {
       showFloodPrimitivesGLB(floodStore.index)
     }
   })

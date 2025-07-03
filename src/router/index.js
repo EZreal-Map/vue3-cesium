@@ -3,6 +3,8 @@ import FloodView from '@/views/FloodView.vue'
 import NotFound from '@/views/NotFound.vue'
 
 const yearsOptions = ['5years', '30years', '50years']
+const typeOptions = ['glb', 'png']
+const defaultType = 'glb'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,12 +22,40 @@ const router = createRouter({
       name: 'flood',
       component: FloodView,
       beforeEnter: (to, from, next) => {
-        const yearsParam = to.params.years
-        if (yearsOptions.includes(yearsParam)) {
-          next() // 如果在指定的数组范围内，继续导航
-        } else {
-          next('/flood/404') // 否则导航到 NotFound 组件或其他适当的路由
+        const { years } = to.params
+        const { type } = to.query
+
+        // 校验年份参数
+        if (!yearsOptions.includes(years)) {
+          console.log(
+            `Invalid years parameter: ${years}. Valid options are: ${yearsOptions.join(
+              ', '
+            )}`
+          )
+          return next('/flood/404')
         }
+
+        // 如果没传 type，自动附加默认类型
+        if (!type) {
+          return next({
+            name: 'flood',
+            params: { years },
+            query: { type: defaultType }
+          })
+        }
+
+        // 校验 type 参数是否合法
+        if (!typeOptions.includes(type)) {
+          console.log(
+            `Invalid type parameter: ${type}. Valid options are: ${typeOptions.join(
+              ', '
+            )}`
+          )
+          return next('/flood/404')
+        }
+
+        // 合法就继续导航
+        next()
       }
     },
     {

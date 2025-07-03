@@ -4,44 +4,53 @@ import os
 from pyproj import Proj
 import time
 
+
 def get_numeric_subdirectories(directory_path):
-    subdirectories = [name for name in os.listdir(directory_path) 
-                      if os.path.isdir(os.path.join(directory_path, name)) and name.isdigit()]
+    subdirectories = [
+        name
+        for name in os.listdir(directory_path)
+        if os.path.isdir(os.path.join(directory_path, name)) and name.isdigit()
+    ]
     return subdirectories
 
+
 def write_subdirectories_to_file(sorted_subdirectories, file_path):
-    with open(file_path, 'w') as f:
+    with open(file_path, "w") as f:
         # 将每个子目录名称写入文件，每个名称占一行
         for directory in sorted_subdirectories[:-1]:
             f.write(str(directory) + "\n")
         # 最后一行领出来for循环写，避免文件末尾多出一行空行
         f.write(str(sorted_subdirectories[-1]))
 
+
 def read_data_between_brackets(file_path):
     data = []
     inside_brackets = False
 
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
-            if ')\n' == line:
+            if ")\n" == line:
                 inside_brackets = False
                 break
             if inside_brackets:
-                line = float(line.rstrip('\n'))  # 移除行末的换行符
+                line = float(line.rstrip("\n"))  # 移除行末的换行符
                 data.append(line)
-            if '(\n' == line:
+            if "(\n" == line:
                 inside_brackets = True
     return data
+
 
 def generate_color_gradient(num_segments, start_color, end_color):
     # 获取颜色渐变数组
     gradient_colors = []
     for i in range(num_segments):
-        t = i / (num_segments )
+        t = i / (num_segments)
         r = start_color[0] + (end_color[0] - start_color[0]) * t
         g = start_color[1] + (end_color[1] - start_color[1]) * t
         b = start_color[2] + (end_color[2] - start_color[2]) * t
-        gradient_colors.append([round(r), round(g), round(b)])  # 将颜色值为0-255的范围 round()四省五入取整
+        gradient_colors.append(
+            [round(r), round(g), round(b)]
+        )  # 将颜色值为0-255的范围 round()四省五入取整
 
     return gradient_colors
 
@@ -52,14 +61,15 @@ def get_interval_index(H, intervals):
     #              3, 3.5, 4, 4.5, 5, 7.5, 10, float('inf')]
 
     # 循环遍历所有区间，找到第一个H小于等于的区间，然后返回对应的索引
-    for i in range(len(intervals)-1):
-        if H < intervals[i+1]:
+    for i in range(len(intervals) - 1):
+        if H < intervals[i + 1]:
             return i
+
 
 def get_gamma_color(H):
     start_color = [149, 208, 238]
     end_color = [10, 9, 145]
-    delta_color = [-139, -199, -93] # end_color-start_color
+    delta_color = [-139, -199, -93]  # end_color-start_color
     Hmax = 10.01
     Hmin = 0.01
     if H > Hmax:
@@ -67,34 +77,39 @@ def get_gamma_color(H):
     elif H < Hmin:
         return [255, 255, 255]
     else:
-        h = (H-Hmin)/(Hmax - Hmin) # 归一化
-        return [round(item * h**(1/2.2) + start_color[index]) for index, item in enumerate(delta_color)]
-    
-def isBuildingBoundary(faces):
+        h = (H - Hmin) / (Hmax - Hmin)  # 归一化
+        return [
+            round(item * h ** (1 / 2.2) + start_color[index])
+            for index, item in enumerate(delta_color)
+        ]
+
+
+def isNotBuildingBoundary(faces):
     for item in faces:
-        if(rectify_vertices[item][2] > 15):
+        if rectify_vertices[item][2] > 15:
             return False
     return True
+
 
 # 主函数main()
 # 记录开始时间
 start_time = time.time()
-directory_path = './flood/30years/openForm'
+directory_path = "./flood/30years/openForm"
 subdirectories = get_numeric_subdirectories(directory_path)
 # 按照数字大小排序
 sorted_subdirectories = sorted(subdirectories, key=lambda x: int(x))
 
 # 因为每个文件夹里面的DEM数据都是不变的，读取一份就行
-S_file_path = os.path.join(directory_path, sorted_subdirectories[1], 'S')
+S_file_path = os.path.join(directory_path, sorted_subdirectories[1], "S")
 S_data = read_data_between_brackets(S_file_path)  # 关键数据 DEM
 
 # 生成颜色渐变数组，从浅蓝色到深蓝色
-intervals = [0.01,0.25, 0.50, 1.0, 1.50, 2.0, 2.5,
-             3, 3.5, 4, float('inf')]
+intervals = [0.01, 0.25, 0.50, 1.0, 1.50, 2.0, 2.5, 3, 3.5, 4, float("inf")]
 start_color = [149, 208, 238]
 end_color = [10, 9, 145]
 gradient_colors = generate_color_gradient(
-    len(intervals)-1, start_color, end_color)  # gradient_colors的长度比intervals长度小1
+    len(intervals) - 1, start_color, end_color
+)  # gradient_colors的长度比intervals长度小1
 # print(gradient_colors)
 # 定义一个空列表用于存储面信息
 faces = []
@@ -102,16 +117,15 @@ faces = []
 vertices = []
 
 # 打开并读取文件
-with open( os.path.join(
-    directory_path, '../../mesh_1108.2dm'), 'r') as file:
+with open(os.path.join(directory_path, "../../mesh_1108.2dm"), "r") as file:
     # 逐行读取文件内容
     for line in file:
         # 如果行以'E3T'开头，提取第3到5个数，并将其转为整数后减1（因为索引从0开始）
-        if line.startswith('E3T'):
+        if line.startswith("E3T"):
             face_data = list(map(int, line.split()[2:5]))
             face_data = [x - 1 for x in face_data]  # 减1以符合Python的索引规则
             faces.append(face_data)
-        if line.startswith('ND'):
+        if line.startswith("ND"):
             vertex_data = list(map(float, line.split()[2:5]))
             vertices.append(vertex_data)
 # 输出faces
@@ -119,31 +133,34 @@ with open( os.path.join(
 
 
 # 定义一个UTM投影坐标系统，用做center.txt坐标（utm113）转换为经纬度坐标
-utm113 = Proj("+proj=tmerc +lon_0=113.35 +y_0=0 +x_0=500000 +ellps=IAU76 \
-+towgs84=-7.849095,18.661172,12.682502,0.809388,-1.667217,-56.719783,-3.30421e-007 +units=m +no_defs")
+utm113 = Proj(
+    "+proj=tmerc +lon_0=113.35 +y_0=0 +x_0=500000 +ellps=IAU76 \
++towgs84=-7.849095,18.661172,12.682502,0.809388,-1.667217,-56.719783,-3.30421e-007 +units=m +no_defs"
+)
 
-threshold = 0.01 # 选择H高度 阈值
-count = 1 # 打印进度
-lengthStatistics =[] # 保存阈值筛选后的三角网格数量
+threshold = 0.01  # 选择H高度 阈值
+count = 1  # 打印进度
+lengthStatistics = []  # 保存阈值筛选后的三角网格数量
 
 for directory in sorted_subdirectories:
-    print(f'当前正在写入第 {count}/{len(sorted_subdirectories)} 个文件夹----{directory}')
+    print(
+        f"当前正在写入第 {count}/{len(sorted_subdirectories)} 个文件夹----{directory}"
+    )
 
     # Hrgb_inputfile_path = os.path.join(
     #     directory_path, directory, 'Hrgb.txt')
-    glb_outputfile_directory = os.path.join(
-        directory_path, '../glb', directory)
-    
+    glb_outputfile_directory = os.path.join(directory_path, "../glb", directory)
+
     # 检查文件夹路径是否存在，如果不存在则创建它
     if not os.path.exists(glb_outputfile_directory):
         os.makedirs(glb_outputfile_directory)
-    
-    glb_outputfile_path = os.path.join(glb_outputfile_directory, 'triangle_mesh.glb')
+
+    glb_outputfile_path = os.path.join(glb_outputfile_directory, "triangle_mesh.glb")
     print(glb_outputfile_path)
     # 从不同时刻文件读取数据并拆分成顶点坐标和颜色信息
     # data = np.loadtxt(Hrgb_inputfile_path, delimiter=',')
     # H = data[:, :1]  # 第一列是H
-    H_file_path = os.path.join(directory_path,  directory, 'H')
+    H_file_path = os.path.join(directory_path, directory, "H")
     H = read_data_between_brackets(H_file_path)  # 关键数据 水深
     # facesColor = data[:, 1:]    # 后三列是r, g, b颜色值
     # faces = [[0, 1, 2],[0, 1, 3]]
@@ -155,11 +172,11 @@ for directory in sorted_subdirectories:
     # position_max_x = 0
     # position_max_y = 0
     # position_max_z = 0
+    # 把OpenFoam计算的面H值加到对应的顶点上（简化处理，第一个遍历到的点+H值）
     for i, value in enumerate(faces):
-        # print(value)
         for index in value:
-            if rectify_vertices[index,2] == vertices[index][2]:
-                rectify_vertices[index,2] += H[i]
+            if rectify_vertices[index, 2] == vertices[index][2]:
+                rectify_vertices[index, 2] += H[i]
                 # if H[i] > threshold:
                 #     if rectify_vertices[index,0] < position_min_x:
                 #         position_min_x = rectify_vertices[index,0]
@@ -170,7 +187,7 @@ for directory in sorted_subdirectories:
                 #         position_min_y = rectify_vertices[index,1]
                 #     elif rectify_vertices[index,1] > position_max_y:
                 #         position_max_y = rectify_vertices[index,1]
-                    
+
                 #     if rectify_vertices[index,2] < position_min_z:
                 #         position_min_z = rectify_vertices[index,2]
                 #     elif rectify_vertices[index,2] > position_max_z:
@@ -196,24 +213,29 @@ for directory in sorted_subdirectories:
     utm_x, utm_y = utm113(longitude, latitude, inverse=False)
     # print(f"中心点修正 ---> longitude: {longitude}, latitude: {latitude}, Height: {height}")
     # print(f"中心点修正 ---> utm_x: {utm_x}, utm_y: {utm_y}, Height: {height}")
-    
+
     # rectify_vertices = np.array(vertices)
-    rectify_vertices = rectify_vertices - np.array([utm_x,utm_y,height])
+    rectify_vertices = rectify_vertices - np.array([utm_x, utm_y, height])
     # 把下表面 + H 变为 上表面
     # rectify_vertices[:,2] =  rectify_vertices[:,2] + np.array(H)
     rectify_vertices = rectify_vertices.tolist()
 
-    # 清除H<0.05的faces数据
+    # 清除H<0.01的faces数据
     clearFaces = []
     clearFacesColor = []
     for i, h in enumerate(H):
-        if(h > threshold and isBuildingBoundary(faces[i])):          
-            clearFaces.append(faces[i])  
+        if h > threshold and isNotBuildingBoundary(faces[i]):
+            clearFaces.append(faces[i])
             # 获取对应 H 的颜色表示 rgb
             # 方法一： 旧方法-interval区间法获取H对应的颜色
             index = get_interval_index(h, intervals)
             # if (index == 0):
             #     print(index)
+            # 风险带的添加 2024-1-13
+            # if h>0.5 and h<0.6:
+            #     rgbList = [255,0,0]
+            # else:
+            #     rgbList = gradient_colors[index]
             rgbList = gradient_colors[index]
             # 方法二： 直接连续计算获取颜色 （非线性--gamma幂函数）
             # rgbList = get_gamma_color(h)
@@ -229,10 +251,10 @@ for directory in sorted_subdirectories:
     lengthStatistics.append(len(clearFaces))
 
     mesh = trimesh.Trimesh(vertices=rectify_vertices, faces=clearFaces)
-    mesh.visual.face_colors = clearFacesColor    
-    
+    mesh.visual.face_colors = clearFacesColor
+
     # 创建一个字典来存储自定义属性（可能有问题，目前还没起作用 -> 0927）
-    # custom_attributes = {}  
+    # custom_attributes = {}
     # # 为每个面分配自定义数据（例如，面的编号）
     # for i, face in enumerate(mesh.faces):
     #     custom_attributes[i] = {"KHR_materials_unlit": {}}
@@ -241,21 +263,19 @@ for directory in sorted_subdirectories:
     # mesh.metadata['face_attributes'] = custom_attributes
 
     # 保存为glb格式
-    mesh.export(glb_outputfile_path, file_type='glb')
-    
+    mesh.export(glb_outputfile_path, file_type="glb")
+
     count += 1
     # 用trimesh内置的方法进行可视化
     # mesh.show()
 
 # 保存子目录为directory_path = '/flood/30years/glb' 里面的subcontent.txt文件
-subcontent_file_path = os.path.join(
-    directory_path, '../glb/subcontents.txt')
+subcontent_file_path = os.path.join(directory_path, "../glb/subcontents.txt")
 # 调用函数，将子目录名称写入 subcontent.txt 文件
 write_subdirectories_to_file(sorted_subdirectories, subcontent_file_path)
 
 # 借用写子目录函数，保存lengthStatistics
-lengthStatistics_file_path = os.path.join(
-    directory_path, '../glb/echartSeries.txt')
+lengthStatistics_file_path = os.path.join(directory_path, "../glb/echartSeries.txt")
 # 调用函数，将子目录名称写入 subcontent.txt 文件
 write_subdirectories_to_file(lengthStatistics, lengthStatistics_file_path)
 
@@ -263,4 +283,4 @@ write_subdirectories_to_file(lengthStatistics, lengthStatistics_file_path)
 end_time = time.time()
 # 计算运行时间
 execution_time = end_time - start_time
-print("代码运行时间为：", execution_time, "秒")   # 代码运行时间为： 283.9342534542084 秒
+print("代码运行时间为：", execution_time, "秒")  # 代码运行时间为： 283.9342534542084 秒

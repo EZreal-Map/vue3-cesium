@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 export const useFloodStore = defineStore('flood', () => {
   const index = ref(0)
   const maxIndex = computed(() => subcontents.value.length)
-  const years = ref(30)
+  const years = ref('30years')
   let initReady = ref(false)
   let subcontents = ref([])
   let echartSeries = ref([])

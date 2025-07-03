@@ -26,19 +26,34 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useFloodStore } from '../stores/flood'
 const router = useRouter()
+const route = useRoute()
 const floodStore = useFloodStore()
 const routerArray = ['5years', '30years', '50years']
 let activeBoxIndex = ref(routerArray.indexOf(floodStore.years) + 1)
 
 const changeSelectBox = (index) => {
   activeBoxIndex.value = index
-  const newRoute = '/flood/' + routerArray[index - 1]
-  router.push(newRoute).catch(() => {}) // 使用 catch 防止重复导航时的错误
+  const newYears = routerArray[index - 1]
+
+  console.log('切换洪水类型:', newYears)
+
+  const newRoute = {
+    name: 'flood',
+    params: { years: newYears },
+    query: route.query // 保留原有 query（如 ?type=glb/?type=png）
+  }
+
+  // 更新 floodStore 的 years (持久化存储)
   floodStore.setYears(routerArray[index - 1])
-  window.location.href = newRoute // 使用 window.location.href 重新加载页面
+  // 正确方式获取完整 href 字符串
+  const href = router.resolve(newRoute).href
+  // 路由跳转（非刷新）
+  // router.push(newRoute).catch(() => {})
+  // 强制刷新页面（如果你确实需要重建场景）
+  window.location.href = href
 }
 </script>
 

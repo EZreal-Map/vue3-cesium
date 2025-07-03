@@ -18,7 +18,8 @@
       </el-header>
 
       <el-main class="main" style="--el-main-padding: 0">
-        <cesiumContainer> </cesiumContainer>
+        <!-- 使用动态组件，根据不同query参数，分别加载glb/png -->
+        <component :is="cesiumComponent" />
         <div class="buttonPanel">
           <div class="buttonPanel-left">
             <el-link :underline="false">
@@ -67,14 +68,10 @@
       </el-footer>
     </el-container>
   </div>
-
-  <!-- <div class="rightContainer">
-    <cesiumContainer>
-    </cesiumContainer>
-  </div> -->
 </template>
 <script setup>
-import cesiumContainer from '../components/cesiumContainer.vue'
+import cesiumContainerGLB from '../components/cesiumContainerGLB.vue'
+import cesiumContainerPNG from '../components/cesiumContainerPNG.vue'
 import echartsContainer from '../components/echartsContainer.vue'
 import legendContainer from '../components/legendContainer.vue'
 import dashboardContaioner from '../components/dashboardContaioner.vue'
@@ -83,6 +80,7 @@ import { useFloodStore } from '../stores/flood'
 import { useStateStore } from '../stores/state'
 import { useRoute } from 'vue-router'
 import { Top, Bottom, View, Hide } from '@element-plus/icons-vue'
+import { computed } from 'vue'
 
 const floodStore = useFloodStore()
 const stateStore = useStateStore()
@@ -104,7 +102,13 @@ floodStore.setYears(route.params.years)
   // console.log(floodStore.initReady)
 })()
 
-// console.log(floodStore.subcontents[150])
+// 获取路由的params参数
+const cesiumComponent = computed(() => {
+  const type = route.query.type
+  if (type === 'glb') return cesiumContainerGLB
+  if (type === 'png') return cesiumContainerPNG
+  return cesiumContainerGLB // 默认 fallback，也可以是 NotFound
+})
 </script>
 
 <style>

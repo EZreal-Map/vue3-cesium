@@ -46,6 +46,8 @@ import {
 } from '@element-plus/icons-vue'
 import { onMounted, ref, watchEffect } from 'vue'
 import { useFloodStore } from '../stores/flood'
+import { useStateStore } from '@/stores/state'
+const stateStore = useStateStore()
 
 const percentage = ref(0)
 const floodStore = useFloodStore()
@@ -62,6 +64,7 @@ const playStartHandle = () => {
     intervalID.value = setInterval(() => {
       floodStore.setIndex(floodStore.index + 1)
     }, 200)
+    stateStore.setPlayInterval(intervalID.value) // 保存 intervalID 到状态存储
   }
 }
 
@@ -69,6 +72,7 @@ const stopInterval = () => {
   if (intervalID.value !== null) {
     clearInterval(intervalID.value)
     intervalID.value = null
+    stateStore.setPlayInterval(intervalID.value) // 清除状态存储中的 intervalID
   }
 }
 </script>
